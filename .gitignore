@@ -1,0 +1,18 @@
+node_modules/
+.venv/
+apm_modules/
+build/
+dist/
+coverage/
+
+# APM and harness projections are generated from canonical sources.
+.agents/
+
+# Local environment and editor noise.
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+__pycache__/
+*.py[cod]

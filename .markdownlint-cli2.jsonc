@@ -1,0 +1,25 @@
+{
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD024": {
+      "siblings_only": true
+    },
+    "no-hard-wrapped-prose": true
+  },
+  "customRules": [
+    ".markdownlint-rules.cjs"
+  ],
+  "globs": [
+    "**/*.md"
+  ],
+  "ignores": [
+    "CLAUDE.md",
+    "node_modules/**",
+    ".venv/**",
+    "apm_modules/**",
+    "build/**",
+    "dist/**",
+    "coverage/**"
+  ]
+}

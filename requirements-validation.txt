@@ -1,0 +1,3 @@
+# Direct validation tools are pinned. Their Python package metadata resolves transitive dependencies.
+apm-cli==0.31.0
+skills-ref==0.1.1

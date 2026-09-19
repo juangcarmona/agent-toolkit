@@ -1,0 +1,13 @@
+name: agent-toolkit
+version: 0.1.0
+description: Reusable, vendor-neutral agent capabilities with standards-aware validation.
+author: Juan G. Carmona
+license: MIT
+targets:
+  - agent-skills
+includes:
+  - skills/agent-skill-authoring
+dependencies:
+  apm: []
+  mcp: []
+scripts: {}

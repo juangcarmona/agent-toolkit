@@ -1,0 +1,25 @@
+{
+  "name": "agent-toolkit",
+  "private": true,
+  "description": "Authoring and validation tooling for reusable agent capabilities.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "setup:validation": "node scripts/setup-python.mjs",
+    "audit:dependencies": "npm audit --audit-level=critical",
+    "lint:markdown": "markdownlint-cli2",
+    "validate:skills": "node scripts/validate-skills.mjs",
+    "validate:links": "node scripts/validate-links.mjs",
+    "validate:discovery": "node scripts/validate-discovery.mjs",
+    "validate:packages": "node scripts/validate-package.mjs",
+    "validate": "npm run audit:dependencies && npm run lint:markdown && npm run validate:skills && npm run validate:links && npm run validate:discovery && npm run validate:packages"
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "0.23.2",
+    "skills": "1.7.0",
+    "yaml": "2.9.1"
+  }
+}
