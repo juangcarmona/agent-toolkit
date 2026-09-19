@@ -87,9 +87,12 @@ try {
     },
   });
   requireSuccess(installAll, "skills CLI whole-collection installation");
-  const installedAll = readFileSync(join(allConsumer, ".agents", "skills", "agent-skill-authoring", "SKILL.md"), "utf8");
-  if (source !== installedAll) {
-    throw new Error("skills CLI whole-collection installation differs from the canonical source.");
+  for (const name of expectedNames) {
+    const installedAll = readFileSync(join(allConsumer, ".agents", "skills", name, "SKILL.md"), "utf8");
+    const canonical = readFileSync(repositoryPath("skills", name, "SKILL.md"), "utf8");
+    if (canonical !== installedAll) {
+      throw new Error(`skills CLI whole-collection installation differs from the canonical source: ${name}`);
+    }
   }
 } finally {
   rmSync(scratch, { recursive: true, force: true, maxRetries: 3 });

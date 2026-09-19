@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pythonTool, repositoryPath, requireSuccess, run } from "./tooling.mjs";
@@ -45,10 +45,16 @@ try {
   requireSuccess(install, "APM compatibility bundle installation smoke test");
   process.stdout.write(install.stdout);
 
-  const source = readFileSync(repositoryPath("skills", "agent-skill-authoring", "SKILL.md"), "utf8");
-  const projection = readFileSync(join(consumer, ".agents", "skills", "agent-skill-authoring", "SKILL.md"), "utf8");
-  if (source !== projection) {
-    throw new Error("APM projection differs from the canonical skill source.");
+  const skillNames = readdirSync(repositoryPath("skills"), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  for (const skillName of skillNames) {
+    const source = readFileSync(repositoryPath("skills", skillName, "SKILL.md"), "utf8");
+    const projection = readFileSync(join(consumer, ".agents", "skills", skillName, "SKILL.md"), "utf8");
+    if (source !== projection) {
+      throw new Error(`APM projection differs from the canonical skill source: ${skillName}`);
+    }
   }
 
   const audit = run(apm, ["audit", "--ci"], {

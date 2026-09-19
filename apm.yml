@@ -7,6 +7,7 @@ targets:
   - agent-skills
 includes:
   - skills/agent-skill-authoring
+  - skills/document-to-markdown
 dependencies:
   apm: []
   mcp: []

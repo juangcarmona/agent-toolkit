@@ -2,7 +2,7 @@
 
 Agent Toolkit is a local-first repository for reusable agent capabilities. It keeps portable Agent Skills as canonical source and uses Microsoft Agent Package Manager (APM) as a composition and distribution layer without maintaining harness-specific copies.
 
-The bootstrap catalog contains one working capability, [`agent-skill-authoring`](skills/agent-skill-authoring/SKILL.md), so the repository's discovery, validation, and packaging paths are exercised end to end. The repository is not published yet; remote installation commands and release guarantees would therefore be misleading.
+The bootstrap catalog contains two working capabilities, [`agent-skill-authoring`](skills/agent-skill-authoring/SKILL.md) and [`document-to-markdown`](skills/document-to-markdown/SKILL.md), so the repository's discovery, validation, and packaging paths are exercised end to end. The repository is not published yet; remote installation commands and release guarantees would therefore be misleading.
 
 ## Standards and tools
 
