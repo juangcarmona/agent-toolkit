@@ -1,0 +1,6 @@
+{
+  "name": "product-definition",
+  "version": "0.1.0",
+  "description": "Product definition as a capability: discover, model, connect, review and maintain explicit product knowledge, from lightweight Markdown to full Product Definition as Code (PDaC).",
+  "agents": ["./agents/"]
+}

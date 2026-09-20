@@ -1,0 +1,7 @@
+{
+  "name": "agentic-sdlc",
+  "version": "0.1.0",
+  "description": "An adaptive development lifecycle for agent-driven delivery: readiness and verification gates, deterministic checks, and explicit human approval.",
+  "skills": ["./skills/"],
+  "agents": ["./agents/"]
+}

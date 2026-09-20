@@ -20,6 +20,7 @@
     "apm_modules/**",
     "build/**",
     "dist/**",
-    "coverage/**"
+    "coverage/**",
+    ".agents/**"
   ]
 }

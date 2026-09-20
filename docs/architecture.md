@@ -8,6 +8,12 @@ skills/<name>/                 canonical Agent Skill source
         +--> skills CLI       individual discovery and installation
         |
         +--> APM              composition, locking, packing, target projection
+        |
+        +--> packages/<name>/skills/   shared-skill dependencies (git + skills subset)
+
+packages/<name>/               cohesive multi-primitive packages (plugin.json + apm.yml)
+        |
+        +--> APM              package install, dependency resolution, projection
 ```
 
 The Agent Skills specification defines what is inside a skill but does not prescribe a source repository layout. The Vercel skills CLI discovers repository collections under `skills/`, while APM recognizes `skills/<name>/SKILL.md` as a multi-skill package. This common denominator avoids copies, symlinks, generated source mirrors, and vendor-specific discovery manifests. The full rationale is recorded in [ADR 0001](decisions/0001-canonical-skill-location.md).
@@ -18,6 +24,8 @@ The Agent Skills specification defines what is inside a skill but does not presc
 | --- | --- | --- |
 | Repository instructions | `AGENTS.md` | `CLAUDE.md` imports it; no duplicated handbook. |
 | Reusable skills | `skills/<name>/` | One flat, portable collection. |
+| Cohesive multi-primitive packages | `packages/<name>/` | Self-contained systems (skills + commands + agents) with their own `plugin.json` and `apm.yml`; see [ADR 0002](decisions/0002-nested-plugin-packages.md). Current packages: `agentic-sdlc` (delivery lifecycle) and `product-definition` (product-definition capability with the `product-engineer` advisory agent). |
+| Shared skills | `skills/<name>/` referenced by a package's `apm.yml` git dependency with a `skills:` subset | One canonical copy; packages receive them through a locked dependency instead of duplication. |
 | Reusable instructions | Not created yet | Add under `.apm/instructions/` only when a concrete APM-composed instruction exists. |
 | Prompts and commands | Not created yet | Add an APM source location only for a concrete explicit entry point. |
 | Agents | Not created yet | Add an APM source location only when isolated execution is essential. |
