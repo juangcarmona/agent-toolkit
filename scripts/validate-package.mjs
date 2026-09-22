@@ -76,18 +76,24 @@ try {
       `    - path: ${repositoryPath("packages", packageName).split(sep).join("/")}`,
       "",
     ].join("\n"));
-    // APM 0.31.0's pip-launcher exe silently skips file deployment for local-path
-    // dependencies when spawned directly from Node (directory stubs only). Invoking
-    // it through PowerShell restores full deployment; revisit when APM's launcher
-    // changes.
-    const pluginInstall = run(
-      "powershell.exe",
-      ["-NoProfile", "-Command", `& '${apm.replace(/'/g, "''")}' install --target copilot`],
-      {
-        cwd: pluginConsumer,
-        env: { ...process.env, APM_DISABLE_UPDATE_CHECK: "1" },
-      },
-    );
+    // APM 0.31.0's Windows pip-launcher exe silently skips file deployment for
+    // local-path dependencies when spawned directly from Node (directory stubs only).
+    // Invoking it through PowerShell restores full deployment on Windows; on Linux the
+    // launcher is a plain script and direct spawn works. Revisit when APM's launcher changes.
+    const isWindows = process.platform === "win32";
+    const pluginInstall = isWindows
+      ? run(
+          "powershell.exe",
+          ["-NoProfile", "-Command", `& '${apm.replace(/'/g, "''")}' install --target copilot`],
+          {
+            cwd: pluginConsumer,
+            env: { ...process.env, APM_DISABLE_UPDATE_CHECK: "1" },
+          },
+        )
+      : run(apm, ["install", "--target", "copilot"], {
+          cwd: pluginConsumer,
+          env: { ...process.env, APM_DISABLE_UPDATE_CHECK: "1" },
+        });
     requireSuccess(pluginInstall, `${packageName} plugin package installation smoke test`);
     process.stdout.write(pluginInstall.stdout);
 

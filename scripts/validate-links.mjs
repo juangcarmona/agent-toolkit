@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { repositoryPath } from "./tooling.mjs";
 
-const ignoredDirectories = new Set([".git", ".venv", "node_modules", "apm_modules", "build", "dist", "coverage"]);
+const ignoredDirectories = new Set([".git", ".venv", ".venv-linux", "node_modules", "apm_modules", "build", "dist", "coverage"]);
 const markdownFiles = [];
 
 function collectMarkdown(directory) {

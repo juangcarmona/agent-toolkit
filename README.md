@@ -15,7 +15,7 @@ See [architecture](docs/architecture.md) for the source-of-truth map and [distri
 
 ## Local setup and validation
 
-Requirements are Node.js 22 or newer, npm, Python 3.10 or newer, and Git.
+Requirements are Node.js 24 or newer, npm, Python 3.10 or newer, and Git.
 
 ```shell
 npm install
