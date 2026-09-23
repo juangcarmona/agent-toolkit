@@ -6,6 +6,7 @@ Agent Toolkit contains portable, reusable agent capabilities and the tooling tha
 
 - Maintain one canonical representation for every capability.
 - Put canonical Agent Skills in `skills/<name>/`; never mirror them manually under `.apm/skills/` or harness directories.
+- Put cohesive multi-primitive systems (skills, commands, and agents that only make sense together) in `packages/<name>/` with their own manifests; reference skills shared with the root collection through the package's `apm.yml` git dependency rather than copying them.
 - Keep reusable capabilities free of consuming-project paths, policies, and assumptions.
 - Use progressive disclosure: concise entry points should route to focused references, assets, or scripts.
 - Prefer upstream standards and validators over repository-specific reinvention.

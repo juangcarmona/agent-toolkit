@@ -1,4 +1,4 @@
-import { lstatSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync, readdirSync } from "node:fs";
 import { relative, sep } from "node:path";
 import YAML from "yaml";
 import { pythonTool, repositoryPath, requireSuccess, run } from "./tooling.mjs";
@@ -13,6 +13,24 @@ const skillDirectories = readdirSync(skillsRoot, { withFileTypes: true })
 if (skillDirectories.length === 0) {
   throw new Error("No canonical skills were found under skills/.");
 }
+
+// Nested packages under packages/<name>/ may ship their own skills/<name>/SKILL.md collections.
+// They are validated with the same rules but are not part of the root catalog.
+const packagesRoot = repositoryPath("packages");
+const packageSkillDirectories = existsSync(packagesRoot)
+  ? readdirSync(packagesRoot, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .flatMap((packageEntry) => {
+        const packageSkillsRoot = repositoryPath("packages", packageEntry.name, "skills");
+        if (!existsSync(packageSkillsRoot)) {
+          return [];
+        }
+        return readdirSync(packageSkillsRoot, { withFileTypes: true })
+          .filter((entry) => entry.isDirectory())
+          .map((entry) => repositoryPath("packages", packageEntry.name, "skills", entry.name));
+      })
+      .sort()
+  : [];
 
 function parseFrontmatter(skillFile) {
   const content = readFileSync(skillFile, "utf8");
@@ -51,17 +69,20 @@ function assertNoSymlinks(directory) {
 }
 
 const discoveredSkillFiles = findSkillFiles(repositoryPath()).sort();
-const canonicalSkillFiles = skillDirectories.map((directory) => repositoryPath(relative(repositoryPath(), directory), "SKILL.md"));
+const canonicalSkillFiles = [
+  ...skillDirectories.map((directory) => repositoryPath(relative(repositoryPath(), directory), "SKILL.md")),
+  ...packageSkillDirectories.map((directory) => repositoryPath(relative(repositoryPath(), directory), "SKILL.md")),
+];
 const canonicalSet = new Set(canonicalSkillFiles);
 
 for (const skillFile of discoveredSkillFiles) {
   if (!canonicalSet.has(skillFile)) {
-    throw new Error(`SKILL.md outside the canonical skills/<name>/ layout: ${relative(repositoryPath(), skillFile)}`);
+    throw new Error(`SKILL.md outside the canonical skills/<name>/ or packages/<name>/skills/<name>/ layouts: ${relative(repositoryPath(), skillFile)}`);
   }
 }
 
 const names = new Set();
-for (const skillDirectory of skillDirectories) {
+for (const skillDirectory of [...skillDirectories, ...packageSkillDirectories]) {
   if (lstatSync(skillDirectory).isSymbolicLink()) {
     throw new Error(`Canonical skill directories must not be symbolic links: ${relative(repositoryPath(), skillDirectory)}`);
   }
@@ -81,4 +102,4 @@ for (const skillDirectory of skillDirectories) {
   requireSuccess(validation, `Agent Skills validation for ${relative(repositoryPath(), skillDirectory).split(sep).join("/")}`);
 }
 
-console.log(`Validated ${skillDirectories.length} skill(s) with the Agent Skills reference CLI and repository structure rules.`);
+console.log(`Validated ${skillDirectories.length} root skill(s) and ${packageSkillDirectories.length} package skill(s) with the Agent Skills reference CLI and repository structure rules.`);

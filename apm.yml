@@ -8,6 +8,21 @@ targets:
 includes:
   - skills/agent-skill-authoring
   - skills/document-to-markdown
+  - skills/adr
+  - skills/architecture-docs
+  - skills/git-worktrees
+  - skills/refine-with-docs
+  - skills/refining
+  - skills/presentation-brief
+  - skills/product-definition
+  - skills/presentation-qa
+  - skills/rebase-safely
+  - skills/research
+  - skills/slidev-deck
+  - skills/writing-beats
+  - skills/writing-for-agents
+  - skills/writing-fragments
+  - skills/writing-shape
 dependencies:
   apm: []
   mcp: []

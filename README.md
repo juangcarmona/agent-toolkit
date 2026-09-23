@@ -2,7 +2,7 @@
 
 Agent Toolkit is a local-first repository for reusable agent capabilities. It keeps portable Agent Skills as canonical source and uses Microsoft Agent Package Manager (APM) as a composition and distribution layer without maintaining harness-specific copies.
 
-The bootstrap catalog contains two working capabilities, [`agent-skill-authoring`](skills/agent-skill-authoring/SKILL.md) and [`document-to-markdown`](skills/document-to-markdown/SKILL.md), so the repository's discovery, validation, and packaging paths are exercised end to end. The repository is not published yet; remote installation commands and release guarantees would therefore be misleading.
+The catalog contains seventeen root skills — authoring and review ([`agent-skill-authoring`](skills/agent-skill-authoring/SKILL.md)), document conversion ([`document-to-markdown`](skills/document-to-markdown/SKILL.md)), decision records and architecture documentation ([`adr`](skills/adr/SKILL.md), [`architecture-docs`](skills/architecture-docs/SKILL.md)), product definition ([`product-definition`](skills/product-definition/SKILL.md), from lightweight Markdown to full [PDaC](https://pdac.dev/spec/)), refinement and research ([`refining`](skills/refining/SKILL.md), [`refine-with-docs`](skills/refine-with-docs/SKILL.md), [`research`](skills/research/SKILL.md)), writing ([`writing-fragments`](skills/writing-fragments/SKILL.md), [`writing-shape`](skills/writing-shape/SKILL.md), [`writing-beats`](skills/writing-beats/SKILL.md), [`writing-for-agents`](skills/writing-for-agents/SKILL.md)), presentations ([`presentation-brief`](skills/presentation-brief/SKILL.md), [`presentation-qa`](skills/presentation-qa/SKILL.md), [`slidev-deck`](skills/slidev-deck/SKILL.md)), and git safety ([`rebase-safely`](skills/rebase-safely/SKILL.md), [`git-worktrees`](skills/git-worktrees/SKILL.md)) — plus two packages under `packages/`: the [`agentic-sdlc`](packages/agentic-sdlc/README.md) lifecycle and the [`product-definition`](packages/product-definition/README.md) capability (five `/product` commands and the advisory `product-engineer` agent), each sharing skills with the root collection through APM git dependencies instead of duplicating them. The repository's discovery, validation, and packaging paths are exercised end to end.
 
 ## Standards and tools
 
@@ -15,7 +15,7 @@ See [architecture](docs/architecture.md) for the source-of-truth map and [distri
 
 ## Local setup and validation
 
-Requirements are Node.js 22 or newer, npm, Python 3.10 or newer, and Git.
+Requirements are Node.js 24 or newer, npm, Python 3.10 or newer, and Git.
 
 ```shell
 npm install

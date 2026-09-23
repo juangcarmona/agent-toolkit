@@ -17,9 +17,11 @@
     "CLAUDE.md",
     "node_modules/**",
     ".venv/**",
+    ".venv-linux/**",
     "apm_modules/**",
     "build/**",
     "dist/**",
-    "coverage/**"
+    "coverage/**",
+    ".agents/**"
   ]
 }

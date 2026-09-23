@@ -1,0 +1,9 @@
+name: agentic-sdlc
+version: 0.1.0
+description: "An adaptive development lifecycle for agent-driven delivery: readiness and verification gates, deterministic checks, and explicit human approval."
+author: juangcarmona
+license: MIT
+dependencies:
+  apm:
+    - git: juangcarmona/agent-toolkit
+      skills: [adr, rebase-safely, git-worktrees]

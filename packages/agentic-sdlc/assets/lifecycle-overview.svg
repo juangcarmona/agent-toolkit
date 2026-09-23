@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1272 288" width="1272" height="288"
+     role="img" aria-labelledby="title desc"
+     font-family="'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif">
+  <title id="title">From a backlog item to a merged change</title>
+  <desc id="desc">The agentic-sdlc loop: Backlog, Refine, Propose, Implement, Integrate, Review. Refine ends at the Ready gate, verified by an agent. Propose ends at the Planned gate, verified by a human. Implement ends at the Done gate, verified by CI and a human. Review feeds back into the backlog.</desc>
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,1 L9,5 L0,9" fill="none" stroke="#1D4ED8" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+
+    <g id="i-backlog" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="-10" cy="-8" r="1.7" fill="#1D4ED8" stroke="none"/>
+      <circle cx="-10" cy="0"  r="1.7" fill="#1D4ED8" stroke="none"/>
+      <circle cx="-10" cy="8"  r="1.7" fill="#1D4ED8" stroke="none"/>
+      <path d="M-4,-8 H11 M-4,0 H11 M-4,8 H11"/>
+    </g>
+    <g id="i-refine" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-10,10 L-8.6,4.4 L3,-7.2 L7.2,-3 L-4.4,8.6 Z"/>
+      <path d="M0.6,-4.6 L4.8,-0.4"/>
+    </g>
+    <g id="i-propose" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-8,-11 H2.5 L8,-5.5 V11 H-8 Z"/>
+      <path d="M2.5,-11 V-5.5 H8"/>
+      <path d="M-4.5,1 H4.5 M-4.5,6 H4.5"/>
+    </g>
+    <g id="i-implement" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-4,-8 L-11,0 L-4,8"/>
+      <path d="M4,-8 L11,0 L4,8"/>
+      <path d="M1.6,-9.5 L-1.6,9.5"/>
+    </g>
+    <g id="i-integrate" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="-8" cy="0" r="3"/>
+      <circle cx="8" cy="-8" r="3"/>
+      <circle cx="8" cy="8" r="3"/>
+      <path d="M-5,0 C0,0 1,-8 5,-8"/>
+      <path d="M-5,0 C0,0 1,8 5,8"/>
+    </g>
+    <g id="i-review" stroke="#1D4ED8" stroke-width="3.4" stroke-linecap="round">
+      <path d="M-8,10 V0"/><path d="M0,10 V-5"/><path d="M8,10 V-10"/>
+    </g>
+  </defs>
+
+  <rect x="0" y="0" width="1272" height="288" rx="12" fill="#FFFFFF"/>
+
+  <g fill="#F2F6FD" stroke="#D3E0F7">
+    <rect x="56"   y="16" width="170" height="196" rx="14"/>
+    <rect x="254"  y="16" width="170" height="196" rx="14"/>
+    <rect x="452"  y="16" width="170" height="196" rx="14"/>
+    <rect x="650"  y="16" width="170" height="196" rx="14"/>
+    <rect x="848"  y="16" width="170" height="196" rx="14"/>
+    <rect x="1046" y="16" width="170" height="196" rx="14"/>
+  </g>
+
+  <use href="#i-backlog"   transform="translate(141,54)"/>
+  <use href="#i-refine"    transform="translate(339,54)"/>
+  <use href="#i-propose"   transform="translate(537,54)"/>
+  <use href="#i-implement" transform="translate(735,54)"/>
+  <use href="#i-integrate" transform="translate(933,54)"/>
+  <use href="#i-review"    transform="translate(1131,54)"/>
+
+  <g text-anchor="middle" font-size="19" font-weight="700" fill="#12276B">
+    <text x="141"  y="94">Backlog</text>
+    <text x="339"  y="94">Refine</text>
+    <text x="537"  y="94">Propose</text>
+    <text x="735"  y="94">Implement</text>
+    <text x="933"  y="94">Integrate</text>
+    <text x="1131" y="94">Review</text>
+  </g>
+
+  <g text-anchor="middle" font-size="13.5" fill="#5A6C92">
+    <text x="141"  y="115">An idea</text>
+    <text x="141"  y="132">or issue</text>
+    <text x="339"  y="115">Understand</text>
+    <text x="339"  y="132">the problem</text>
+    <text x="537"  y="115">Design</text>
+    <text x="537"  y="132">the solution</text>
+    <text x="735"  y="115">Build and test</text>
+    <text x="735"  y="132">the change</text>
+    <text x="933"  y="115">Enforce the gate</text>
+    <text x="933"  y="132">and merge</text>
+    <text x="1131" y="115">Learn and</text>
+    <text x="1131" y="132">improve</text>
+  </g>
+
+  <g stroke="#D3E0F7">
+    <path d="M278,148 H400"/>
+    <path d="M476,148 H598"/>
+    <path d="M674,148 H796"/>
+  </g>
+
+  <g text-anchor="middle" font-size="13" font-weight="700" fill="#1D4ED8">
+    <text x="339" y="169">Ready gate</text>
+    <text x="537" y="169">Planned gate</text>
+    <text x="735" y="169">Done gate</text>
+  </g>
+
+  <g text-anchor="middle" font-size="11.5" fill="#5A6C92">
+    <text x="339" y="186">Verified by an agent</text>
+    <text x="537" y="186">Verified by a human</text>
+    <text x="735" y="186">Verified by CI</text>
+    <text x="735" y="201">and a human</text>
+  </g>
+
+  <g fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" marker-end="url(#ar)">
+    <path d="M230,108 H248"/>
+    <path d="M428,108 H446"/>
+    <path d="M626,108 H644"/>
+    <path d="M824,108 H842"/>
+    <path d="M1022,108 H1040"/>
+  </g>
+
+  <g fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1131,212 V252 Q1131,260 1123,260 H812"/>
+    <path d="M468,260 H149 Q141,260 141,252 V219" marker-end="url(#ar)"/>
+  </g>
+  <text x="640" y="265" text-anchor="middle" font-size="13.5" fill="#5A6C92">Better definitions. Better delivery.</text>
+</svg>

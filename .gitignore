@@ -1,5 +1,6 @@
 node_modules/
 .venv/
+.venv-linux/
 apm_modules/
 build/
 dist/
