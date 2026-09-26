@@ -18,7 +18,7 @@
     "validate": "npm run audit:dependencies && npm run lint:markdown && npm run validate:skills && npm run validate:links && npm run validate:discovery && npm run validate:packages"
   },
   "devDependencies": {
-    "markdownlint-cli2": "0.23.2",
+    "markdownlint-cli2": "0.23.3",
     "skills": "1.7.0",
     "yaml": "2.9.1"
   }
