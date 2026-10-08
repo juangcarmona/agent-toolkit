@@ -1,6 +1,6 @@
 ---
 name: architecture-docs
-description: Maintain software architecture documentation by assessing architecture impact, reconciling it with implementation evidence and ADRs, citing the project's product-intent source where one exists, and pruning or migrating legacy content. Use for architecture reviews, stale architecture docs, or changes to system boundaries, major components, runtime, persistence, security, deployment, cross-cutting mechanisms, quality realization, risks, or technical debt.
+description: Maintain software architecture documentation by assessing architecture impact, reconciling it with implementation evidence and ADRs, citing the project's product-intent source where one exists, and pruning or migrating legacy content. Use for architecture reviews, stale architecture docs, or changes to system boundaries, major components, runtime, persistence, security, deployment, cross-cutting mechanisms, quality realization, risks, or technical debt. Also publishes a self-contained, navigable HTML snapshot of the arc42 documentation via the arc42-snapshot tool.
 license: MIT
 metadata:
   author: juangcarmona
@@ -41,6 +41,8 @@ Read only the sections affected by the task:
 | Architecture terminology | [Glossary](references/arc42-12-glossary.md) |
 
 When an architectural concern depends on product intent, also read [product-intent citations](references/product-intent-citations.md). When the project maintains no product-intent source, treat product-dependent claims as unverified assumptions and say so rather than inventing a source of truth.
+
+To publish a shareable, self-contained HTML rendering of the arc42 documentation, read [arc42 snapshot](references/arc42-snapshot.md).
 
 ## Document contract
 
@@ -141,6 +143,20 @@ When the project's product-intent source provides citation verification, run it 
 
 Report the significance decision, files changed, evidence checked, product-intent citation status, ADRs created or referenced, legacy content removed or deferred, checks run and unresolved risks. This step is complete when validation passes or every remaining failure is reported without being hidden.
 
+### 9. Publish a shareable snapshot (optional)
+
+When the documentation update is ready for review or reaches a milestone, generate a self-contained, navigable HTML snapshot so stakeholders can browse the full arc42 picture without cloning the repository. The snapshot tool is bundled with this skill at `snapshot/` and reads the same document contract defined above. It renders one file with sidebar navigation, full-text search, pre-rendered Mermaid diagrams, and a Git revision stamp.
+
+```bash
+# One-time: install dependencies
+cd <skill-install-dir>/snapshot && npm install
+
+# Generate from any arc42 docs folder
+node <skill-install-dir>/snapshot/generate.mjs path/to/docs/architecture
+```
+
+The default output is `arc42-snapshot.html` written as a sibling of the docs folder; override with `--out <file>`. The tool's diagnostics also serve as a secondary contract check: missing frontmatter, duplicate section numbers, or numbering gaps cause generation to fail with exit code 2. See [arc42 snapshot](references/arc42-snapshot.md) for full usage details. This step is optional; skip it when no shareable rendering is needed.
+
 ## Final challenge
 
 Before finishing, answer each question with evidence:
@@ -155,5 +171,6 @@ Before finishing, answer each question with evidence:
 - Are all architecture claims evidenced rather than invented?
 - Are decisions linked to ADRs without duplicating their rationale?
 - Is each fact owned once, with summaries linking to it, so documentation cannot grow by accumulation alone?
+- If a snapshot was generated, does it reflect the final state of the edited documents and pass the tool's contract validation?
 
 Any `no` reopens the relevant workflow step.
