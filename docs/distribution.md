@@ -19,6 +19,8 @@ The CLI does not currently list `.apm/skills/` among its standard repository dis
 
 APM recognizes `skills/<name>/SKILL.md` as a multi-skill package layout. The root [`apm.yml`](../apm.yml) provides package identity, an explicit local publication boundary, and empty dependency groups that can later compose other packages without copying primitives. Validation builds APM's portable Agent Plugins v1 format explicitly. It also builds the legacy compatibility plugin solely to exercise APM's Copilot projection into the shared `.agents/skills/` path; that compatibility format is not the repository's portability claim.
 
+The architecture skill's snapshot runtime is declared file-by-file because APM recursively includes directory contents even when local `node_modules` are gitignored. Its runtime manifest and integrity lockfile ship; installed dependencies, browser caches and repository-only regression tests do not. Package validation checks runtime file fidelity and rejects dependency or test directories in the portable bundle.
+
 From a separate consumer checkout, a local development install can select one capability:
 
 ```shell

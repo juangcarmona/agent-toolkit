@@ -62,6 +62,9 @@ function assertNoSymlinks(directory) {
     if (entry.isSymbolicLink()) {
       throw new Error(`Canonical skill content must not use symbolic links: ${relative(repositoryPath(), path)}`);
     }
+    if (entry.name === "node_modules" && entry.isDirectory()) {
+      continue;
+    }
     if (entry.isDirectory()) {
       assertNoSymlinks(path);
     }

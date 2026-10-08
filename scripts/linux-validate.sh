@@ -20,6 +20,10 @@ node scripts/validate-skills.mjs || exit 1
 echo "=== validate:links ==="
 node scripts/validate-links.mjs || exit 1
 
+echo "=== validate:snapshot ==="
+npm run setup:snapshot || exit 1
+npm run validate:snapshot || exit 1
+
 echo "=== validate:packages ==="
 node scripts/validate-package.mjs || exit 1
 
