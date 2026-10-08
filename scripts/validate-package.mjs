@@ -23,6 +23,24 @@ try {
   requireSuccess(build, "APM package build");
   process.stdout.write(build.stdout);
 
+  const portableBundle = join(bundleOutput, "agent-toolkit-0.1.0");
+  const snapshotFiles = ["generate.mjs", "loadDocs.mjs", "render.mjs", "shell.mjs", "package.json", "package-lock.json"];
+  for (const name of snapshotFiles) {
+    const relativePath = join("skills", "architecture-docs", "snapshot", name);
+    if (readFileSync(repositoryPath(relativePath), "utf8") !== readFileSync(join(portableBundle, relativePath), "utf8")) {
+      throw new Error(`Snapshot runtime projection differs from canonical source: ${name}`);
+    }
+  }
+  function assertPublicationBoundary(directory) {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      if (entry.name === "node_modules" || /(?:\.test\.|\.spec\.|^tests?$)/i.test(entry.name)) {
+        throw new Error(`Repository tests and installed dependencies must not ship: ${join(directory, entry.name)}`);
+      }
+      if (entry.isDirectory()) assertPublicationBoundary(join(directory, entry.name));
+    }
+  }
+  assertPublicationBoundary(portableBundle);
+
   const compatibilityOutput = join(scratch, "compatibility-bundle");
   const compatibilityBuild = run(apm, ["pack", "--format", "plugin", "--offline", "--output", compatibilityOutput], {
     env: { ...process.env, APM_DISABLE_UPDATE_CHECK: "1" },

@@ -9,13 +9,15 @@
   },
   "scripts": {
     "setup:validation": "node scripts/setup-python.mjs",
+    "setup:snapshot": "npm ci --ignore-scripts --prefix skills/architecture-docs/snapshot",
     "audit:dependencies": "npm audit --audit-level=critical",
     "lint:markdown": "markdownlint-cli2",
     "validate:skills": "node scripts/validate-skills.mjs",
     "validate:links": "node scripts/validate-links.mjs",
+    "validate:snapshot": "npm audit --prefix skills/architecture-docs/snapshot --audit-level=critical && node --test scripts/validate-snapshot.test.mjs",
     "validate:discovery": "node scripts/validate-discovery.mjs",
     "validate:packages": "node scripts/validate-package.mjs",
-    "validate": "npm run audit:dependencies && npm run lint:markdown && npm run validate:skills && npm run validate:links && npm run validate:discovery && npm run validate:packages"
+    "validate": "npm run audit:dependencies && npm run lint:markdown && npm run validate:skills && npm run validate:links && npm run validate:snapshot && npm run validate:discovery && npm run validate:packages"
   },
   "devDependencies": {
     "markdownlint-cli2": "0.23.2",

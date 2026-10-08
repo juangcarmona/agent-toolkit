@@ -9,7 +9,14 @@ includes:
   - skills/agent-skill-authoring
   - skills/document-to-markdown
   - skills/adr
-  - skills/architecture-docs
+  - skills/architecture-docs/SKILL.md
+  - skills/architecture-docs/references
+  - skills/architecture-docs/snapshot/generate.mjs
+  - skills/architecture-docs/snapshot/loadDocs.mjs
+  - skills/architecture-docs/snapshot/render.mjs
+  - skills/architecture-docs/snapshot/shell.mjs
+  - skills/architecture-docs/snapshot/package.json
+  - skills/architecture-docs/snapshot/package-lock.json
   - skills/git-worktrees
   - skills/refine-with-docs
   - skills/refining

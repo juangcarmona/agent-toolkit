@@ -1,19 +1,13 @@
-/**
- * render.mjs — Markdown → HTML pipeline for the arc42 snapshot.
- *
- *  - Markdown rendered with `marked`, fully escaped by it (authored content never
- *    becomes executable).
- *  - ```mermaid fenced blocks are extracted and pre-rendered to inline SVG at
- *    build time via mermaid-cli; the SVGs are normalized for determinism.
- *  - Relative .md links between sections are rewritten to hash routes
- *    (#/section/NN). Links to anything outside the docs folder (evidence paths,
- *    ../adr/...) become inert monospaced text: a single file cannot carry them.
- */
 import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, posix } from 'node:path';
 import { Marked } from 'marked';
-import { run } from '@mermaid-js/mermaid-cli';
+import GithubSlugger from 'github-slugger';
+import createDOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
+
+const window = new JSDOM('').window;
+const purifier = createDOMPurify(window);
 
 /** Escape text for safe interpolation into HTML. */
 export function escapeHtml(text) {
@@ -25,51 +19,58 @@ export function escapeHtml(text) {
     .replace(/'/g, '&#39;');
 }
 
-/**
- * Normalize a mermaid-cli SVG for inlining in the single snapshot file:
- *
- *  - strip the XML prolog, comments and the xlink namespace declaration;
- *  - give the diagram a unique root id (mmd-<index>) and rewrite EVERY
- *    internal reference to it. Mermaid hardcodes the root id "my-svg" in the
- *    id attribute, in its internal <style> selectors (#my-svg .node …) and
- *    in generated ids (my-svg_flowchart-v2-pointEnd), so a plain token
- *    replacement keeps mermaid's own styling alive — renaming the id without
- *    rewriting the selectors would silently drop every fill, font and
- *    classDef colour — and unique ids stop multiple diagrams colliding;
- *  - keep only a rounded intrinsic max-width on the root, dropping the rest
- *    of the inline style (and any sub-pixel layout jitter with it);
- *  - renumber the remaining generated ids under the same unique prefix so
- *    url(#…) references cannot cross between diagrams.
- */
-function normalizeMermaidSvg(svg, index) {
-  let out = svg
-    .replace(/<\?xml[^>]*\?>/g, '')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/\sxmlns:xlink="[^"]*"/g, '');
-
-  // Unique root id: replace the token everywhere it occurs (id, selectors, refs).
-  const rootId = `mmd-${index}`;
-  out = out.replace(/my-svg/g, rootId);
-
-  // Root style: keep only the intrinsic max-width, rounded to whole pixels.
-  out = out.replace(/\sstyle="([^"]*)"/, (m, css) => {
-    const widthMatch = /max-width:\s*([\d.]+)px/.exec(css);
-    return widthMatch ? ` style="max-width: ${Math.round(Number(widthMatch[1]))}px"` : '';
+export function normalizeMermaidSvg(svg, index) {
+  const clean = purifier.sanitize(svg, {
+    USE_PROFILES: { html: true, svg: true, svgFilters: true },
+    ADD_TAGS: ['foreignObject'],
+    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'image', 'img', 'audio', 'video', 'link', 'use', 'animate', 'set', 'animateMotion', 'animateTransform'],
   });
-
-  // Renumber remaining generated ids under the diagram's own prefix. The
-  // root id must be skipped: mermaid's internal <style> targets it by name.
+  const document = new window.DOMParser().parseFromString(clean, 'image/svg+xml');
+  const root = document.documentElement;
+  if (root.localName !== 'svg' || document.querySelector('parsererror')) {
+    throw new Error('Mermaid produced invalid SVG');
+  }
+  const rootId = `mmd-${index}`;
   const idMap = new Map();
-  const remap = (id) => {
-    if (id === rootId) return id;
-    if (!idMap.has(id)) idMap.set(id, `${rootId}-x${idMap.size + 1}`);
-    return idMap.get(id);
-  };
-  out = out.replace(/\sid="([^"]+)"/g, (_m, id) => ` id="${remap(id)}"`);
-  out = out.replace(/url\(#([^)]+)\)/g, (_m, id) => `url(#${remap(id)})`);
-  out = out.replace(/href="#([^"]+)"/g, (_m, id) => ` href="#${remap(id)}"`);
-
-  return out.trim();
+  for (const element of [root, ...root.querySelectorAll('[id]')]) {
+    const oldId = element.getAttribute('id');
+    const newId = element === root ? rootId : `${rootId}-x${idMap.size}`;
+    if (oldId) idMap.set(oldId, newId);
+    element.setAttribute('id', newId);
+  }
+  const rewriteReferences = (value) => value.replace(/url\(\s*["']?#([^\s)"']+)["']?\s*\)/g,
+    (match, id) => idMap.has(id) ? `url(#${idMap.get(id)})` : match);
+  const unsafeCss = (value) => /@import|(?:https?:|data:|file:|\/\/)|url\(\s*["']?(?!#)/i.test(value);
+  for (const element of [root, ...root.querySelectorAll('*')]) {
+    for (const attribute of [...element.attributes]) {
+      const { name, value } = attribute;
+      if (/^(?:href|xlink:href|src)$/i.test(name)) {
+        if (value.startsWith('#') && idMap.has(value.slice(1))) {
+          element.setAttribute(name, `#${idMap.get(value.slice(1))}`);
+        } else {
+          element.removeAttribute(name);
+        }
+      } else if (name === 'aria-labelledby' || name === 'aria-describedby') {
+        element.setAttribute(name, value.split(/\s+/).map((id) => idMap.get(id) ?? id).join(' '));
+      } else if (unsafeCss(value)) {
+        element.removeAttribute(name);
+      } else {
+        element.setAttribute(name, rewriteReferences(value));
+      }
+    }
+  }
+  for (const style of root.querySelectorAll('style')) {
+    if (unsafeCss(style.textContent)) {
+      style.remove();
+    } else {
+      style.textContent = rewriteReferences(style.textContent)
+        .replace(/#([a-zA-Z_][\w:.-]*)/g, (match, id) => idMap.has(id) ? `#${idMap.get(id)}` : match);
+    }
+  }
+  const width = /max-width:\s*([\d.]+)px/.exec(root.getAttribute('style') ?? '');
+  root.removeAttribute('style');
+  if (width) root.setAttribute('style', `max-width: ${Math.round(Number(width[1]))}px`);
+  return new window.XMLSerializer().serializeToString(root);
 }
 
 /**
@@ -79,6 +80,7 @@ function normalizeMermaidSvg(svg, index) {
  */
 export async function renderMermaid(sources) {
   if (sources.length === 0) return [];
+  const { run } = await import('@mermaid-js/mermaid-cli');
   const staging = await mkdtemp(join(tmpdir(), 'arc42-mermaid-'));
   try {
     const svgFiles = [];
@@ -89,7 +91,10 @@ export async function renderMermaid(sources) {
       await run(inFile, outFile, {
         quiet: true,
         outputFormat: 'svg',
-        parseMMDOptions: { backgroundColor: 'transparent' },
+        parseMMDOptions: {
+          backgroundColor: 'transparent',
+          mermaidConfig: { securityLevel: 'strict', htmlLabels: false },
+        },
       });
       const raw = await readFile(outFile, 'utf8');
       svgFiles.push(normalizeMermaidSvg(raw, i));
@@ -100,52 +105,58 @@ export async function renderMermaid(sources) {
   }
 }
 
-/**
- * Build a marked instance configured for the arc42 snapshot.
- *
- * @param {Map<string,string>} fileToRoute maps section file names (and README.md)
- *        to hash routes, e.g. "05-building-block-view.md" -> "#/section/05"
- * @param {(svgIndex: number) => string} svgPlaceholder returns the placeholder
- *        token for the nth mermaid diagram
- */
-function createMarked(fileToRoute, svgPlaceholder) {
+function isMermaid(lang) {
+  return String(lang ?? '').trim().split(/\s+/)[0] === 'mermaid';
+}
+
+function createMarked(fileToRoute, svgs, currentRoute) {
   const marked = new Marked({ gfm: true });
+  const slugger = new GithubSlugger();
   let mermaidCount = 0;
 
   marked.use({
     renderer: {
-      // Fenced code: mermaid blocks become placeholders resolved after rendering.
+      html({ text }) {
+        return escapeHtml(text);
+      },
+      heading({ tokens, depth }) {
+        const text = this.parser.parseInline(tokens);
+        const plain = window.document.createElement('div');
+        plain.innerHTML = text;
+        const id = slugger.slug(plain.textContent);
+        return `<h${depth} id="${escapeHtml(id)}">${text}</h${depth}>\n`;
+      },
       code({ text, lang }) {
-        if (lang === 'mermaid') {
-          const index = mermaidCount;
-          mermaidCount += 1;
-          return svgPlaceholder(index);
+        if (isMermaid(lang)) {
+          const svg = svgs[mermaidCount++];
+          if (!svg) throw new Error('Mermaid diagram count does not match parsed Markdown');
+          return `<figure class="diagram">${svg}</figure>`;
         }
         const escaped = escapeHtml(text);
         return `<pre><code${lang ? ` class="language-${escapeHtml(lang)}"` : ''}>${escaped}</code></pre>\n`;
       },
-      // Links: rewrite relative .md links to hash routes; anything else that
-      // points outside the single file becomes inert monospaced text.
       link({ href, title, tokens }) {
         const text = this.parser.parseInline(tokens);
-        const cleanHref = String(href ?? '');
-        if (/^(https?:|mailto:|#|\/)/.test(cleanHref)) {
-          // External or absolute: keep as a real link only if it is a plain URL.
-          if (/^(https?:|mailto:)/.test(cleanHref)) {
-            const t = title ? ` title="${escapeHtml(title)}"` : '';
-            return `<a href="${escapeHtml(cleanHref)}"${t} rel="noopener">${text}</a>`;
-          }
-          return `<span class="xref-dead">${text} <code>${escapeHtml(cleanHref)}</code></span>`;
+        const target = String(href ?? '');
+        const titleAttribute = title ? ` title="${escapeHtml(title)}"` : '';
+        if (/^(?:https?:|mailto:)/i.test(target)) {
+          return `<a href="${escapeHtml(target)}"${titleAttribute} rel="noopener noreferrer">${text}</a>`;
         }
-        const target = cleanHref.split('#')[0];
-        const anchor = cleanHref.includes('#') ? cleanHref.split('#').slice(1).join('#') : '';
-        if (target && fileToRoute.has(target)) {
-          const route = fileToRoute.get(target);
-          const hash = anchor ? `${route}/${anchor}` : route;
-          return `<a href="${hash}">${text}</a>`;
+        const hashIndex = target.indexOf('#');
+        let path = hashIndex < 0 ? target : target.slice(0, hashIndex);
+        let anchor = hashIndex < 0 ? '' : target.slice(hashIndex + 1);
+        try {
+          path = decodeURIComponent(path);
+          anchor = decodeURIComponent(anchor);
+        } catch {
+          return `<span class="xref-dead">${text} <code>${escapeHtml(target)}</code></span>`;
         }
-        // Evidence path or other non-carried file: inert, monospaced, honest.
-        return `<span class="xref-dead">${text} <code>${escapeHtml(cleanHref)}</code></span>`;
+        const route = path ? fileToRoute.get(posix.normalize(path)) : target.startsWith('#') ? currentRoute : undefined;
+        if (route) {
+          const hash = anchor ? `${route.replace(/\/$/, '')}/${encodeURIComponent(anchor)}` : route;
+          return `<a href="${escapeHtml(hash)}"${titleAttribute}>${text}</a>`;
+        }
+        return `<span class="xref-dead">${text} <code>${escapeHtml(target)}</code></span>`;
       },
       image({ href, title, text }) {
         // No images are carried in the single file; name them honestly.
@@ -154,7 +165,7 @@ function createMarked(fileToRoute, svgPlaceholder) {
     },
   });
 
-  return marked;
+  return { marked, count: () => mermaidCount };
 }
 
 /**
@@ -166,22 +177,11 @@ function createMarked(fileToRoute, svgPlaceholder) {
  * @param {string[]} opts.svgs pre-rendered mermaid SVGs for this document
  * @param {string} opts.svgClass css class for inline svg wrappers
  */
-export async function renderMarkdown(body, { fileToRoute, svgs = [], svgClass = 'diagram' }) {
-  let svgIndex = 0;
-  const marked = createMarked(fileToRoute, (index) => `\u0000MERMAID${index}\u0000`);
-  const html = await marked.parse(body);
-
-  // Resolve mermaid placeholders to inline SVGs.
-  const withSvgs = html.replace(/\u0000MERMAID(\d+)\u0000/g, (_m, digits) => {
-    const i = Number(digits);
-    const svg = svgs[i] ?? '';
-    svgIndex = Math.max(svgIndex, i + 1);
-    return svg
-      ? `<figure class="${svgClass}">${svg}</figure>`
-      : '<p class="diagram-missing">[diagram could not be rendered]</p>';
-  });
-
-  return { html: withSvgs, mermaidCount: svgIndex };
+export async function renderMarkdown(body, { fileToRoute, svgs = [], currentRoute = '#/' }) {
+  const renderer = createMarked(fileToRoute, svgs, currentRoute);
+  const html = await renderer.marked.parse(body);
+  if (renderer.count() !== svgs.length) throw new Error('Unused Mermaid SVGs: Markdown extraction and rendering disagree');
+  return { html, mermaidCount: renderer.count() };
 }
 
 /**
@@ -190,11 +190,10 @@ export async function renderMarkdown(body, { fileToRoute, svgs = [], svgClass = 
  * SVGs can be pre-rendered in one batch per document.
  */
 export function extractMermaidSources(body) {
+  const marked = new Marked({ gfm: true });
   const sources = [];
-  const fence = /```mermaid\r?\n([\s\S]*?)```/g;
-  let match;
-  while ((match = fence.exec(body)) !== null) {
-    sources.push(match[1]);
-  }
+  marked.walkTokens(marked.lexer(body), (token) => {
+    if (token.type === 'code' && isMermaid(token.lang)) sources.push(token.text);
+  });
   return sources;
 }

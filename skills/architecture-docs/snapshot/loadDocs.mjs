@@ -6,10 +6,11 @@
  */
 import { readdir, readFile } from 'node:fs/promises';
 import { join, basename, dirname } from 'node:path';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 
 const ALLOWED_KEYS = new Set(['title', 'arc42-section', 'description']);
 const SECTION_FILE = /^(\d{2})-(.+)\.md$/;
+const SECTION_NUMBERS = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, '0'));
 
 export class Diagnostic extends Error {
   constructor(message) {
@@ -29,7 +30,7 @@ export function parseFrontmatter(raw, fileName) {
   }
   let frontmatter;
   try {
-    frontmatter = yaml.load(match[1]) ?? {};
+    frontmatter = yaml.load(match[1], { schema: yaml.JSON_SCHEMA }) ?? {};
   } catch (error) {
     throw new Diagnostic(`${fileName}: unparseable frontmatter: ${error.message}`);
   }
@@ -43,7 +44,7 @@ export function parseFrontmatter(raw, fileName) {
  * Load and validate an arc42 docs folder.
  *
  * Contract (from the architecture-docs skill):
- *  - README.md exists, has title/description frontmatter, never `arc42-section`.
+ *  - README.md exists, optionally has title/description, never `arc42-section`.
  *  - Section files are named NN-slug.md with zero-padded numbers.
  *  - Each has exactly the keys: title, arc42-section, description.
  *  - arc42-section values are unique and match the file number.
@@ -54,7 +55,7 @@ export function parseFrontmatter(raw, fileName) {
 export async function loadDocs(docsDir) {
   const entries = await readdir(docsDir, { withFileTypes: true });
   const mdFiles = entries
-    .filter((e) => e.isFile() && e.name.endsWith('.md'))
+    .filter((entry) => entry.isFile() && /\.md$/i.test(entry.name))
     .map((e) => e.name)
     .sort();
 
@@ -68,13 +69,17 @@ export async function loadDocs(docsDir) {
     throw new Diagnostic(`${docsDir}: no NN-*.md section files found`);
   }
 
-  const problems = [];
+  const problems = mdFiles
+    .filter((name) => name !== readmeName && !SECTION_FILE.test(name))
+    .map((name) => `${name}: unexpected Markdown file; name an arc42 section NN-slug.md or move supporting material into a subdirectory`);
   const sections = [];
   const seenNumbers = new Map();
 
   // --- README: navigation index, never a section itself.
   const readmeRaw = await readFile(join(docsDir, readmeName), 'utf8');
-  const readmeParsed = parseFrontmatter(readmeRaw, readmeName);
+  const readmeParsed = /^---\r?\n/.test(readmeRaw)
+    ? parseFrontmatter(readmeRaw, readmeName)
+    : { frontmatter: {}, body: readmeRaw };
   for (const key of Object.keys(readmeParsed.frontmatter)) {
     if (key === 'arc42-section') {
       problems.push(`${readmeName}: README must not carry arc42-section (it is navigation, not a section)`);
@@ -82,8 +87,11 @@ export async function loadDocs(docsDir) {
       problems.push(`${readmeName}: unexpected frontmatter key "${key}"`);
     }
   }
-  if (!readmeParsed.frontmatter.title) {
-    problems.push(`${readmeName}: missing required frontmatter key "title"`);
+  for (const key of ['title', 'description']) {
+    if (key in readmeParsed.frontmatter &&
+        (typeof readmeParsed.frontmatter[key] !== 'string' || !readmeParsed.frontmatter[key].trim())) {
+      problems.push(`${readmeName}: ${key} must be a nonempty string when present`);
+    }
   }
 
   // --- Sections.
@@ -106,9 +114,14 @@ export async function loadDocs(docsDir) {
     for (const key of ['title', 'arc42-section', 'description']) {
       if (!(key in fm)) {
         problems.push(`${name}: missing required frontmatter key "${key}"`);
+      } else if (typeof fm[key] !== 'string' || !fm[key].trim()) {
+        problems.push(`${name}: ${key} must be a nonempty string`);
       }
     }
-    if (fm['arc42-section'] !== undefined && String(fm['arc42-section']).padStart(2, '0') !== number) {
+    if (!SECTION_NUMBERS.includes(number)) {
+      problems.push(`${name}: section number must be between 01 and 12`);
+    }
+    if (fm['arc42-section'] !== undefined && fm['arc42-section'] !== number) {
       problems.push(`${name}: arc42-section "${fm['arc42-section']}" does not match file number ${number}`);
     }
     if (seenNumbers.has(number)) {
@@ -126,15 +139,8 @@ export async function loadDocs(docsDir) {
     });
   }
 
-  // --- Contiguity: arc42 is twelve sections; report gaps without inventing content.
-  const numbers = sections.map((s) => s.number).sort();
-  for (let i = 0; i < numbers.length - 1; i += 1) {
-    const gap = Number(numbers[i + 1]) - Number(numbers[i]);
-    if (gap > 1) {
-      problems.push(
-        `section numbering jumps from ${numbers[i]} to ${numbers[i + 1]} — sections in between are missing`,
-      );
-    }
+  for (const number of SECTION_NUMBERS) {
+    if (!seenNumbers.has(number)) problems.push(`required arc42 section ${number} is missing`);
   }
 
   if (problems.length > 0) {
@@ -149,10 +155,11 @@ export async function loadDocs(docsDir) {
   // Falls back to the docsDir folder name itself if there is no meaningful parent.
   const parent = basename(dirname(docsDir));
   const grandparent = basename(dirname(dirname(docsDir)));
-  const stackName = (parent && parent !== '.') ? grandparent : basename(docsDir);
+  const stackName = parent === 'docs' ? grandparent : parent || basename(docsDir);
 
   return {
     readme: {
+      file: readmeName,
       title: String(readmeParsed.frontmatter.title ?? 'Architecture Documentation'),
       description: String(readmeParsed.frontmatter.description ?? ''),
       body: readmeParsed.body,

@@ -1,6 +1,6 @@
 ---
 name: architecture-docs
-description: Maintain software architecture documentation by assessing architecture impact, reconciling it with implementation evidence and ADRs, citing the project's product-intent source where one exists, and pruning or migrating legacy content. Use for architecture reviews, stale architecture docs, or changes to system boundaries, major components, runtime, persistence, security, deployment, cross-cutting mechanisms, quality realization, risks, or technical debt. Also publishes a self-contained, navigable HTML snapshot of the arc42 documentation via the arc42-snapshot tool.
+description: Maintain architecture documentation by checking implementation evidence, ADRs and product intent, and pruning legacy content. Use for architecture reviews, stale docs, changes to system boundaries, components, runtime, persistence, security, deployment, cross-cutting mechanisms, quality requirements, risks or technical debt, or publishing a self-contained arc42 HTML snapshot.
 license: MIT
 metadata:
   author: juangcarmona
@@ -148,14 +148,17 @@ Report the significance decision, files changed, evidence checked, product-inten
 When the documentation update is ready for review or reaches a milestone, generate a self-contained, navigable HTML snapshot so stakeholders can browse the full arc42 picture without cloning the repository. The snapshot tool is bundled with this skill at `snapshot/` and reads the same document contract defined above. It renders one file with sidebar navigation, full-text search, pre-rendered Mermaid diagrams, and a Git revision stamp.
 
 ```bash
-# One-time: install dependencies
-cd <skill-install-dir>/snapshot && npm install
+# One-time: install locked dependencies without lifecycle scripts
+npm ci --ignore-scripts --prefix <skill-install-dir>/snapshot
+
+# Explicitly install the pinned browser for Mermaid rendering
+npm exec --offline --prefix <skill-install-dir>/snapshot -- puppeteer browsers install chrome
 
 # Generate from any arc42 docs folder
 node <skill-install-dir>/snapshot/generate.mjs path/to/docs/architecture
 ```
 
-The default output is `arc42-snapshot.html` written as a sibling of the docs folder; override with `--out <file>`. The tool's diagnostics also serve as a secondary contract check: missing frontmatter, duplicate section numbers, or numbering gaps cause generation to fail with exit code 2. See [arc42 snapshot](references/arc42-snapshot.md) for full usage details. This step is optional; skip it when no shareable rendering is needed.
+The tool requires Node.js 24 or later. The default output is `arc42-snapshot.html` written as a sibling of the docs folder; override with `--out <file.html>`. Contract violations, including missing or malformed section frontmatter, missing sections among `01` through `12`, duplicate section numbers, and unexpected Markdown filenames, fail generation with exit code 2. See [arc42 snapshot](references/arc42-snapshot.md) for full usage details. This step is optional; skip it when no shareable rendering is needed.
 
 ## Final challenge
 

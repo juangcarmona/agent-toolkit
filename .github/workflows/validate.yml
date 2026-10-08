@@ -35,7 +35,9 @@ jobs:
           python-version: "3.12"
 
       - name: Install JavaScript dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npm run setup:snapshot
 
       - name: Install validation tools
         run: npm run setup:validation

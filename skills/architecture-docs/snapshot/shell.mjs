@@ -8,6 +8,7 @@
  *  - no external resources, no forms, nothing persisted outside the address.
  */
 import { escapeHtml as esc } from './render.mjs';
+import { createHash } from 'node:crypto';
 
 /* ------------------------------------------------------------------ */
 /* Design tokens: a calm engineering instrument in two appearances.   */
@@ -86,7 +87,7 @@ header.site {
   padding: 0.45rem 1rem; border-bottom: 1px solid var(--line);
   background: var(--raise);
 }
-header.site h1 { margin: 0; font-size: 0.98rem; letter-spacing: -0.005em; white-space: nowrap; }
+header.site h1 { margin: 0; min-width: 0; font-size: 0.98rem; overflow-wrap: anywhere; }
 .revshort {
   font-family: var(--mono); font-size: 0.74rem; color: var(--muted);
   border: 1px solid var(--line); border-radius: 3px; padding: 0.05rem 0.4rem; white-space: nowrap;
@@ -94,11 +95,12 @@ header.site h1 { margin: 0; font-size: 0.98rem; letter-spacing: -0.005em; white-
 header.site .spacer { flex: 1; }
 .iconbtn {
   display: inline-flex; align-items: center; justify-content: center;
+  flex: none;
   width: 1.7rem; height: 1.7rem; border: 1px solid var(--line-strong); border-radius: 4px;
   background: var(--raise); cursor: pointer; color: var(--muted);
 }
 .iconbtn:hover { color: var(--ink); border-color: var(--accent); }
-.appearance { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 4px; overflow: hidden; }
+.appearance { display: inline-flex; flex: none; border: 1px solid var(--line-strong); border-radius: 4px; overflow: hidden; }
 .appearance button {
   border: none; background: var(--raise); color: var(--muted); cursor: pointer;
   padding: 0.15rem 0.5rem; font-size: 0.78rem;
@@ -197,6 +199,12 @@ kbd {
   #shell { flex-direction: column; }
   aside.nav { width: auto; max-height: 32vh; border-right: none; border-bottom: 1px solid var(--line); }
   main#main { padding: 1rem 1rem 3rem; }
+}
+@media (max-width: 520px) {
+  header.site { flex-wrap: wrap; gap: 0.5rem; }
+  header.site h1 { flex: 1 1 calc(100% - 6rem); }
+  header.site .spacer { display: none; }
+  header.site .appearance { margin-left: auto; }
 }
 @media print {
   body { overflow: visible; }
@@ -348,10 +356,19 @@ const script = String.raw`
   function go() {
     var hash = location.hash || '#/';
     var host = doc.getElementById('content');
-    var m = /^#\/section\/(\d+)/.exec(hash);
+    var route = hash.split('?')[0];
+    var m = /^#\/section\/(\d{2})(?:\/([^/]*))?$/.exec(route);
     if (m) showSection(host, m[1]);
     else showOverview(host);
-    syncNav(hash);
+    syncNav(m ? '#/section/' + m[1] : '#/');
+    var anchor = m ? m[2] : /^#\/([^/]*)$/.exec(route);
+    if (!m) anchor = anchor ? anchor[1] : '';
+    if (anchor) {
+      try {
+        var heading = doc.getElementById(decodeURIComponent(anchor));
+        if (heading && host.contains(heading)) heading.scrollIntoView({ block: 'start' });
+      } catch (error) { /* malformed anchors leave the document at its start */ }
+    }
   }
 
   /* ---------- Appearance: carried in the address only ---------- */
@@ -524,6 +541,7 @@ export function buildSnapshotHtml({ readme, sections, stackName, revision }) {
     '<head>',
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width, initial-scale=1">',
+    `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-${createHash('sha256').update(`\n${script}\n`).digest('base64')}'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">`,
     '<meta name="color-scheme" content="light dark">',
     `<title>${esc(stackName)} — arc42 Architecture Snapshot</title>`,
     `<style>\n${style}\n</style>`,

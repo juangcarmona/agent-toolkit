@@ -16,14 +16,12 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { resolve, join, dirname, basename } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve, join, dirname } from 'node:path';
 import { loadDocs, Diagnostic } from './loadDocs.mjs';
 import { renderMarkdown, extractMermaidSources, renderMermaid } from './render.mjs';
 import { buildSnapshotHtml } from './shell.mjs';
 
 const run = promisify(execFile);
-const here = dirname(fileURLToPath(import.meta.url));
 
 function usage(code = 1) {
   process.stdout.write(
@@ -45,10 +43,13 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--out' || arg === '--title') {
+      if (!argv[i + 1] || argv[i + 1].startsWith('--')) usage(1);
       flags[arg.slice(2)] = argv[i + 1];
       i += 1;
     } else if (arg === '--help' || arg === '-h') {
       usage(0);
+    } else if (arg.startsWith('-')) {
+      usage(1);
     } else {
       positional.push(arg);
     }
@@ -86,10 +87,13 @@ async function main() {
   const outFile = flags.out
     ? resolve(flags.out)
     : join(dirname(docsDir), 'arc42-snapshot.html');
+  if (!/\.html?$/i.test(outFile)) {
+    throw new Diagnostic('--out must name an .html or .htm file; authored Markdown is never an output target');
+  }
 
   // Route map: section file names and README.md -> hash routes.
   const fileToRoute = new Map(docs.sections.map((s) => [s.file, `#/section/${s.number}`]));
-  fileToRoute.set('README.md', '#/');
+  fileToRoute.set(docs.readme.file, '#/');
 
   // Pre-render every mermaid diagram across all documents in one batch.
   const readmeMermaid = extractMermaidSources(docs.readme.body);
@@ -118,6 +122,7 @@ async function main() {
     const rendered = await renderMarkdown(section.body, {
       fileToRoute,
       svgs: take(sectionMermaid[i].length),
+      currentRoute: `#/section/${section.number}`,
     });
     sectionsRendered.push({
       number: section.number,
@@ -146,5 +151,5 @@ async function main() {
 
 main().catch((error) => {
   process.stderr.write(`arc42-snapshot: ${error.stack ?? error.message}\n`);
-  process.exit(1);
+  process.exit(error instanceof Diagnostic ? 2 : 1);
 });

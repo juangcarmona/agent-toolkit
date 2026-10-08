@@ -5,21 +5,21 @@ The `arc42-snapshot` tool — bundled inside this skill at `snapshot/` — turns
 ## What it does
 
 1. Reads `README.md` and every `NN-*.md` section file in the docs folder.
-2. Validates the [document contract](../SKILL.md#document-contract) (frontmatter keys, section numbering, contiguity). Contract violations produce diagnostics and exit code 2 — the tool never emits a page that silently omits part of the documentation.
-3. Renders Markdown to HTML via `marked`, rewriting relative `.md` links between sections to hash routes (`#/section/NN`). Links to files outside the docs folder (evidence paths, `../adr/...`) become inert monospaced text — a single file cannot carry them.
-4. Pre-renders every ` ```mermaid ` fenced block to inline SVG via mermaid-cli/Puppeteer, normalizing IDs so multiple diagrams never collide.
+2. Validates the [document contract](../SKILL.md#document-contract): all twelve sections `01` through `12`, unique numbers matching filenames, and exactly three nonempty string metadata values. Section identity must be quoted and zero-padded. README frontmatter is optional; when present, only nonempty `title` and `description` strings are allowed. Unexpected Markdown files at the folder root are diagnosed rather than silently omitted; keep supporting material in subdirectories. Contract violations produce diagnostics and exit code 2.
+3. Renders Markdown through `marked`, displaying raw HTML as escaped text. Section links, `./` paths and heading anchors become hash routes with stable GitHub-style heading IDs. Links to files outside the docs folder (evidence paths, `../adr/...`) and images become inert references; a single file cannot carry them. HTTP(S) and email links remain explicit navigation, not automatically loaded resources.
+4. Uses Markdown tokens to identify Mermaid fences, including tilde fences and nested blocks, while leaving fenced examples untouched. Mermaid CLI/Puppeteer renders diagrams in strict mode. SVG output is sanitized and its identifiers and references are namespaced without changing authored labels.
 5. Writes one HTML file with a sidebar, keyboard navigation (`/` to search, `←`/`→` for prev/next, `?` for shortcuts), light/dark appearance toggle, and a Git revision stamp.
 
 ## Prerequisites (one-time install)
 
-The tool needs Node.js ≥ 18 and three npm packages. Install them once from the skill's `snapshot/` directory:
+The tool needs Node.js 24 or later. Install the exact runtime dependencies from the bundled integrity lockfile, then explicitly install the browser if the documents contain Mermaid diagrams:
 
 ```bash
-cd <skill-install-dir>/snapshot
-npm install
+npm ci --ignore-scripts --prefix <skill-install-dir>/snapshot
+npm exec --offline --prefix <skill-install-dir>/snapshot -- puppeteer browsers install chrome
 ```
 
-This installs `marked`, `js-yaml`, and `@mermaid-js/mermaid-cli` (which pulls in Puppeteer/Chromium for Mermaid rendering).
+The first command disables dependency lifecycle scripts and downloads no browser. The second command uses the already installed Puppeteer CLI to download its pinned Chromium build. Review both the skill and its runtime dependencies before installation. Regression tests are repository tooling and are not part of the installed skill.
 
 ## How to run it
 
@@ -34,9 +34,11 @@ node <skill-install-dir>/snapshot/generate.mjs path/to/docs/architecture --out s
 node <skill-install-dir>/snapshot/generate.mjs path/to/docs/architecture --title "My Platform"
 ```
 
-**Default output:** `<docsDir>/../arc42-snapshot.html` — a sibling of the docs folder. Override with `--out`.
+**Default output:** `<docsDir>/../arc42-snapshot.html` — a sibling of the docs folder. Override with `--out` naming an `.html` or `.htm` file; Markdown paths are rejected. An existing HTML output at that path is replaced only after validation and rendering succeed.
 
 **Mermaid rendering** launches Puppeteer/Chromium; expect ~1–2 minutes for a folder with ~20 diagrams.
+
+The page embeds script-safe JSON and a content-security policy that permits its hashed application script and inline styles while blocking remote subresources. The revision stamp identifies the checkout commit, not a guarantee that source documents were committed; review the source working tree before treating it as a release identifier.
 
 ## When to use it
 
