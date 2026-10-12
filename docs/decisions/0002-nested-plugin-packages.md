@@ -40,3 +40,4 @@ We will introduce a `packages/<name>/` boundary for cohesive multi-primitive sys
 - [APM manifest schema — dependencies](https://microsoft.github.io/apm/reference/manifest-schema/#41-dependenciesapm--listapmdependency)
 - [APM package types](https://microsoft.github.io/apm/reference/package-types/)
 - [ADR 0001: Canonical skill location](0001-canonical-skill-location.md)
+- [ADR 0003: Claude Code marketplace with dependency plugins](0003-claude-code-marketplace-and-dependency-plugins.md), which amends the install-path statements above

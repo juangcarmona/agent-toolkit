@@ -1,5 +1,5 @@
 ---
-name: agentic-sdlc.done-gate-auditor
+name: done-gate-auditor
 description: "Independent Definition of Done auditor. Reconciles the plan against the actual diff, checks evidence completeness, and prepares the judgement items without deciding any. Use when a change reaches the Done gate or a gate verdict is disputed."
 argument-hint: "[work-item-id]"
 metadata:
@@ -23,7 +23,7 @@ You are **done-gate-auditor**, the Definition of Done's independent auditor. You
 
 - Running the pipeline's checks. Those belong in the main session via the `verify-like-ci` skill, where a failure is immediately actionable. This agent reads the evidence those checks produced; it does not run them.
 - Capturing runtime evidence. That is the `verify-runtime` skill. This agent reads the artifacts it captured; it does not capture them.
-- Reporting where a work item sits in the lifecycle. That is `agentic-sdlc.flow-reporter`.
+- Reporting where a work item sits in the lifecycle. That is `flow-reporter`.
 - Deciding a judgement-lane item. That is the human role the configuration names for it.
 
 ## Capabilities

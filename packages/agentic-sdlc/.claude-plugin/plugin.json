@@ -1,0 +1,14 @@
+{
+  "name": "agentic-sdlc",
+  "version": "0.1.0",
+  "description": "An adaptive development lifecycle for agent-driven delivery: readiness and verification gates, deterministic checks, and explicit human approval.",
+  "author": {
+    "name": "Juan G. Carmona"
+  },
+  "license": "MIT",
+  "dependencies": [
+    "adr",
+    "rebase-safely",
+    "git-worktrees"
+  ]
+}

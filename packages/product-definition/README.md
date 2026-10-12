@@ -4,6 +4,10 @@ Product definition as a capability: discover, model, connect, review and maintai
 
 It works at two layers deliberately. **General product definition** helps any repository keep durable, navigable product knowledge without adopting PDaC. **PDaC-aware product definition** respects the actual PDaC model and workflow — canonical artifacts under `docs/product/model/`, typed relationships, stable identifiers, citations and Product Changes — without inventing "PDaC-lite" rules that contradict the specification.
 
+## Install
+
+In Claude Code: `/plugin marketplace add juangcarmona/agent-toolkit`, then `/plugin install product-definition@agent-toolkit`. The shared `product-definition` skill installs with it. For Codex or any other harness, install the skill with the skills CLI; see [Install](../../README.md#install) in the repository README.
+
 ## What is where
 
 | Piece | Location | Job |
@@ -12,7 +16,7 @@ It works at two layers deliberately. **General product definition** helps any re
 | The agent | [`agents/product-engineer.agent.md`](agents/product-engineer.agent.md) | Advisory product-value and simplification analysis over the definition; never modifies it |
 | The commands | [`commands/`](commands/) | Thin entry points that dispatch to the skill's phases |
 
-The skill is shared with the root collection through the package's [`apm.yml`](apm.yml) git dependency rather than duplicated here: one canonical copy, projected to consumers by APM.
+The skill is shared with the root collection through the package's [`apm.yml`](apm.yml) git dependency rather than duplicated here: one canonical copy, delivered to Claude Code users as a dependency plugin and to APM users as a locked git dependency.
 
 ## Commands
 

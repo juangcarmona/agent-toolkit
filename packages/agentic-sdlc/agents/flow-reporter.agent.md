@@ -1,5 +1,5 @@
 ---
-name: agentic-sdlc.flow-reporter
+name: flow-reporter
 description: "Read-only lifecycle status reporter. Gathers tracker, branch, pull request and CI state in its own context and returns one compact report of where an item sits, what comes next, and what has drifted. Use when asking for status without pulling raw state into the working session."
 argument-hint: "[work-item-id]"
 metadata:
@@ -23,7 +23,7 @@ This agent is an optimisation, not a requirement. The `status` skill does the sa
 
 ## When not to invoke
 
-- Auditing the Done gate to decide whether a change may be marked ready for review or merged. That is `agentic-sdlc.done-gate-auditor`.
+- Auditing the Done gate to decide whether a change may be marked ready for review or merged. That is `done-gate-auditor`.
 - Changing anything at all. Every mutation belongs to the capability that owns it: `refine`, `propose`, `implement`, `integrate` or `review`.
 - Setting up the lifecycle configuration this agent reads. That is `adopt`.
 

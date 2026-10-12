@@ -21,6 +21,7 @@ Run `npm run setup:snapshot` to install the snapshot runtime from its own lockfi
 | Snapshot | `npm run validate:snapshot` | Audit the locked snapshot runtime and run repository-only regressions for HTML safety, document completeness, Markdown/SVG rendering, navigation, and CLI behavior. |
 | skills CLI | `npm run validate:discovery` | Discovery of every canonical skill, selected-skill installation with provenance lock generation, and complete-collection installation through the pinned Vercel CLI. |
 | APM | `npm run validate:packages` | Offline portable-plugin pack, compatibility-bundle installation into a temporary Copilot consumer, shared-path projection, byte-for-byte source comparison, and CI audit. |
+| Claude Code | `npm run validate:claude-plugins` | The marketplace and each package's Claude manifest agree with the APM metadata (names, versions, shared-skill dependencies), agent names are valid, and, when the `claude` CLI is installed, `claude plugin validate` passes. |
 
 Markdown rule `MD013` is disabled because arbitrary line wrapping makes prose diffs noisy. The custom `no-hard-wrapped-prose` rule enforces the positive convention: one logical prose paragraph per source line. Custom Markdown rules belong in `.markdownlint-rules.cjs`; non-Markdown repository checks belong in `scripts/`.
 

@@ -8,6 +8,10 @@ It imposes no tracker, no ai harness or engine, no CI system and no methodology.
 
 _Overview only. The normative definitions are the ones `adopt` command writes into each project's own `docs/engineering-lifecycle.md`._
 
+## Install
+
+In Claude Code: `/plugin marketplace add juangcarmona/agent-toolkit`, then `/plugin install agentic-sdlc@agent-toolkit`. The shared skills it uses install with it. For Codex or any other harness, install the skills with the skills CLI; see [Install](../../README.md#install) in the repository README.
+
 ## Scope
 
 The development change lifecycle, from backlog and refinement through planning, implementation, integration and review.
@@ -52,8 +56,8 @@ All namespaced under the plugin, so `/agentic-sdlc:refine PROJ-123`.
 
 | Agent                                                                     | Why it exists                                                                                                                                                                                          |
 | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`agentic-sdlc.done-gate-auditor`](agents/done-gate-auditor.agent.md) | **Required at the Done gate.** Audits the plan against the actual diff in a context that did not write the change, checks evidence completeness, and prepares the judgement items without deciding any |
-| [`agentic-sdlc.flow-reporter`](agents/flow-reporter.agent.md)         | Optional. Gathers tracker, branch, pull request and CI state in its own context so the raw output never reaches the working session                                                                    |
+| [`done-gate-auditor`](agents/done-gate-auditor.agent.md) | **Required at the Done gate.** Audits the plan against the actual diff in a context that did not write the change, checks evidence completeness, and prepares the judgement items without deciding any |
+| [`flow-reporter`](agents/flow-reporter.agent.md)         | Optional. Gathers tracker, branch, pull request and CI state in its own context so the raw output never reaches the working session                                                                    |
 
 Agents are not lifecycle stages. They are used only where isolation or delegation is an explicit requirement.
 
