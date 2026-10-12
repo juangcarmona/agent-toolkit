@@ -24,7 +24,7 @@ The Agent Skills specification defines what is inside a skill but does not presc
 | --- | --- | --- |
 | Repository instructions | `AGENTS.md` | `CLAUDE.md` imports it; no duplicated handbook. |
 | Reusable skills | `skills/<name>/` | One flat, portable collection. |
-| Cohesive multi-primitive packages | `packages/<name>/` | Self-contained systems (skills + commands + agents) with their own `plugin.json` and `apm.yml`; see [ADR 0002](decisions/0002-nested-plugin-packages.md). Current packages: `agentic-sdlc` (delivery lifecycle) and `product-definition` (product-definition capability with the `product-engineer` advisory agent). |
+| Cohesive multi-primitive packages | `packages/<name>/` | Self-contained systems (skills, agents, and commands where a skill alone does not cover an entry point) with their own `plugin.json` and `apm.yml`; see [ADR 0002](decisions/0002-nested-plugin-packages.md). Current packages: `agentic-sdlc` (delivery lifecycle) and `product-definition` (product-definition capability with the `product-engineer` advisory agent). |
 | Shared skills | `skills/<name>/` referenced by a package's `apm.yml` git dependency with a `skills:` subset | One canonical copy; packages receive them through a locked dependency instead of duplication. |
 | Reusable instructions | Not created yet | Add under `.apm/instructions/` only when a concrete APM-composed instruction exists. |
 | Prompts and commands | Not created yet | Add an APM source location only for a concrete explicit entry point. |

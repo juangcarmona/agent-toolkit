@@ -2,11 +2,15 @@
 
 An adaptive development lifecycle for agent-driven delivery: readiness and verification gates, deterministic checks, and explicit human approval, adapted to the tools a project already uses.
 
-It imposes no tracker, no ai harness or engine, no CI system and no methodology. The `adopt` command discovers what a project already uses and writes that down as the project's own configuration.
+It imposes no tracker, no ai harness or engine, no CI system and no methodology. The `adopt` capability discovers what a project already uses and writes that down as the project's own configuration.
 
 ![From a backlog item to a merged change: Backlog, Refine, Propose, Implement, Integrate and Review, with the Ready gate verified by an agent, the Planned gate verified by a human, and the Done gate verified by CI and a human.](assets/lifecycle-overview.svg)
 
-_Overview only. The normative definitions are the ones `adopt` command writes into each project's own `docs/engineering-lifecycle.md`._
+_Overview only. The normative definitions are the ones the `adopt` capability writes into each project's own `docs/engineering-lifecycle.md`._
+
+## Install
+
+In Claude Code: `/plugin marketplace add juangcarmona/agent-toolkit`, then `/plugin install agentic-sdlc@agent-toolkit`. The shared skills it uses install with it. For Codex or any other harness, install the skills with the skills CLI; see [Install](../../README.md#install) in the repository README.
 
 ## Scope
 
@@ -32,13 +36,13 @@ Each adopting project owns its lifecycle configuration after `adopt` writes it. 
 
 ## Contents
 
-Seven capabilities, each with a command entry point and a skill that owns its steps. Ten supporting skills the capabilities call. Two agents. Twenty-five role-capability templates as adoption payload.
+Seven capabilities, each a skill that owns its steps and that you invoke by name. Ten supporting skills the capabilities call. Two agents. Twenty-five role-capability templates as adoption payload.
 
-### Commands
+### Capabilities
 
-All namespaced under the plugin, so `/agentic-sdlc:refine PROJ-123`.
+Skills are slash commands in Claude Code and are namespaced by the plugin, so `/agentic-sdlc:refine PROJ-123`. In other harnesses, ask for the capability by name.
 
-| Command     | What it does                                                      |
+| Capability  | What it does                                                      |
 | ----------- | ----------------------------------------------------------------- |
 | `adopt`     | Bootstrap or reconcile this project's lifecycle configuration     |
 | `refine`    | Stage 1: take an idea or item to the Definition of Ready          |
@@ -52,8 +56,8 @@ All namespaced under the plugin, so `/agentic-sdlc:refine PROJ-123`.
 
 | Agent                                                                     | Why it exists                                                                                                                                                                                          |
 | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`agentic-sdlc.done-gate-auditor`](agents/done-gate-auditor.agent.md) | **Required at the Done gate.** Audits the plan against the actual diff in a context that did not write the change, checks evidence completeness, and prepares the judgement items without deciding any |
-| [`agentic-sdlc.flow-reporter`](agents/flow-reporter.agent.md)         | Optional. Gathers tracker, branch, pull request and CI state in its own context so the raw output never reaches the working session                                                                    |
+| [`done-gate-auditor`](agents/done-gate-auditor.agent.md) | **Required at the Done gate.** Audits the plan against the actual diff in a context that did not write the change, checks evidence completeness, and prepares the judgement items without deciding any |
+| [`flow-reporter`](agents/flow-reporter.agent.md)         | Optional. Gathers tracker, branch, pull request and CI state in its own context so the raw output never reaches the working session                                                                    |
 
 Agents are not lifecycle stages. They are used only where isolation or delegation is an explicit requirement.
 

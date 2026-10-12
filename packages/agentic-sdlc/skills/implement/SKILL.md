@@ -10,7 +10,7 @@ metadata:
 
 Lifecycle stage 3. Turn an approved plan into a **change that is finished and proven**, and end at the Done gate.
 
-Input is a work item identifier, and it is required.
+Input is a work item identifier, and it is required. If none was given, ask for one before starting.
 
 Invoke deliberately. No lifecycle stage runs this one on its own.
 
