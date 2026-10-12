@@ -6,7 +6,7 @@ The catalog contains seventeen root skills — authoring and review ([`agent-ski
 
 ## Install
 
-The packages work in any harness that reads Agent Skills. Claude Code gets the complete package (commands, agents and skills); every other harness gets the skills, which carry the procedures.
+The packages work in any harness that reads Agent Skills. Claude Code gets the complete package (skills, which it invokes as slash commands, plus agents); every other harness gets the skills, which carry the procedures.
 
 **Claude Code**: add the marketplace once, then install what you want.
 
@@ -25,9 +25,9 @@ npx skills add juangcarmona/agent-toolkit/packages/agentic-sdlc -a codex
 npx skills add juangcarmona/agent-toolkit --skill adr --skill rebase-safely --skill git-worktrees -a codex
 ```
 
-Without commands, ask for a stage by name ("refine PROJ-123"); the skills' descriptions route the request. Agents are a Claude Code feature: elsewhere, run the agent's file as a prompt in a fresh session. The Done gate depends on that independence, so do not run it in the session that wrote the change.
+In Claude Code, invoke a stage as `/agentic-sdlc:refine PROJ-123`; elsewhere, ask for it by name ("refine PROJ-123") and the skills' descriptions route the request. Agents are a Claude Code feature: elsewhere, run the agent's file as a prompt in a fresh session. The Done gate depends on that independence, so do not run it in the session that wrote the change.
 
-**APM**: `apm install juangcarmona/agent-toolkit/packages/agentic-sdlc` projects the skills. APM currently classifies these packages as skill bundles, so it does not deploy their commands or agents; use the Claude Code route above for those.
+**APM**: `apm install juangcarmona/agent-toolkit/packages/agentic-sdlc` projects the skills. APM currently classifies these packages as skill bundles, so it does not deploy their agents (or the `product-definition` package's commands); use the Claude Code route above for those.
 
 ## Standards and tools
 

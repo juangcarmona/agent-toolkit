@@ -10,7 +10,7 @@ metadata:
 
 Lifecycle stage 4. Turn an approved change into a **merged** one, with its specifications and its record landing alongside it.
 
-Input is a work item identifier, and it is required.
+Input is a work item identifier, and it is required. If none was given, ask for one before starting.
 
 Invoke deliberately. No lifecycle stage runs this one on its own.
 

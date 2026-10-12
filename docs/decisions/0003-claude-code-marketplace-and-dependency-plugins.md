@@ -7,7 +7,7 @@
 
 ## Context
 
-[ADR 0002](0002-nested-plugin-packages.md) made APM the supported install path for nested packages and recorded that plugin-native installs would not receive the shared skills. In use, an APM install of `agentic-sdlc` deployed its skills but not its seven commands or two agents, including `done-gate-auditor`, which the package's own README calls required at the Done gate. APM classifies a package whose `apm.yml` declares dependencies and ships nested skills as a skill bundle and never reads `plugin.json`, so commands and agents were dropped. The package also had no Claude Code manifest and no documented way to install its commands and agents anywhere else, so a user who was not running APM could not use it as designed.
+[ADR 0002](0002-nested-plugin-packages.md) made APM the supported install path for nested packages and recorded that plugin-native installs would not receive the shared skills. In use, an APM install of `agentic-sdlc` deployed its skills but not its two agents or its seven commands, including `done-gate-auditor`, which the package's own README calls required at the Done gate. APM classifies a package whose `apm.yml` declares dependencies and ships nested skills as a skill bundle and never reads `plugin.json`, so commands and agents were dropped. The package also had no Claude Code manifest and no documented way to install its commands and agents anywhere else, so a user who was not running APM could not use it as designed.
 
 Behaviours verified against Claude Code 2.1.296 with a clean configuration directory:
 
@@ -33,8 +33,8 @@ This amends ADR 0002's statement that the APM route is the only supported instal
 
 ## Consequences
 
-- **Positive:** A Claude Code user installs the complete package, including the agent the Done gate requires, with two commands and no tooling beyond Claude Code. Shared skills keep one canonical copy and install automatically. The metadata that both paths depend on is checked, so it cannot drift silently.
-- **Negative:** Each package now carries two manifests that must agree, and the marketplace adds one dependency plugin per shared skill. Dependency plugins use `source: "./"`, so installing each caches a copy of the repository, which is acceptable at this size. Command names and same-named skills both register inside a plugin, so a command and its skill appear twice in a plugin's inventory.
+- **Positive:** `agentic-sdlc` no longer ships seven commands that only restated its skills; each stage is one skill, invoked as `/agentic-sdlc:<stage>`, and the few input rules the commands added now live in the skills. A Claude Code user installs the complete package, including the agent the Done gate requires, with two commands and no tooling beyond Claude Code. Shared skills keep one canonical copy and install automatically. The metadata that both paths depend on is checked, so it cannot drift silently.
+- **Negative:** Each package now carries two manifests that must agree, and the marketplace adds one dependency plugin per shared skill. Dependency plugins use `source: "./"`, so installing each caches a copy of the repository, which is acceptable at this size.
 - **Neutral:** APM still deploys only a package's skills and shared skills; fixing that depends on APM's package classification and is documented as a limitation. The tested behaviours belong to one Claude Code version and should be rechecked when it changes, which `claude plugin validate` in the validation script helps with.
 
 ## Alternatives considered

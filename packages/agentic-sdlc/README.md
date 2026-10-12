@@ -2,11 +2,11 @@
 
 An adaptive development lifecycle for agent-driven delivery: readiness and verification gates, deterministic checks, and explicit human approval, adapted to the tools a project already uses.
 
-It imposes no tracker, no ai harness or engine, no CI system and no methodology. The `adopt` command discovers what a project already uses and writes that down as the project's own configuration.
+It imposes no tracker, no ai harness or engine, no CI system and no methodology. The `adopt` capability discovers what a project already uses and writes that down as the project's own configuration.
 
 ![From a backlog item to a merged change: Backlog, Refine, Propose, Implement, Integrate and Review, with the Ready gate verified by an agent, the Planned gate verified by a human, and the Done gate verified by CI and a human.](assets/lifecycle-overview.svg)
 
-_Overview only. The normative definitions are the ones `adopt` command writes into each project's own `docs/engineering-lifecycle.md`._
+_Overview only. The normative definitions are the ones the `adopt` capability writes into each project's own `docs/engineering-lifecycle.md`._
 
 ## Install
 
@@ -36,13 +36,13 @@ Each adopting project owns its lifecycle configuration after `adopt` writes it. 
 
 ## Contents
 
-Seven capabilities, each with a command entry point and a skill that owns its steps. Ten supporting skills the capabilities call. Two agents. Twenty-five role-capability templates as adoption payload.
+Seven capabilities, each a skill that owns its steps and that you invoke by name. Ten supporting skills the capabilities call. Two agents. Twenty-five role-capability templates as adoption payload.
 
-### Commands
+### Capabilities
 
-All namespaced under the plugin, so `/agentic-sdlc:refine PROJ-123`.
+Skills are slash commands in Claude Code and are namespaced by the plugin, so `/agentic-sdlc:refine PROJ-123`. In other harnesses, ask for the capability by name.
 
-| Command     | What it does                                                      |
+| Capability  | What it does                                                      |
 | ----------- | ----------------------------------------------------------------- |
 | `adopt`     | Bootstrap or reconcile this project's lifecycle configuration     |
 | `refine`    | Stage 1: take an idea or item to the Definition of Ready          |
