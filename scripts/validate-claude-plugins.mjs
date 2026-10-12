@@ -129,8 +129,16 @@ for (const packageName of packageNames) {
 
 // When the Claude Code CLI is available, let it validate the manifests too. CI runners do not have
 // it, so its absence is a note, not a failure.
-const claude = run("claude", ["--version"]);
-if (claude.status === 0) {
+function claudeAvailable() {
+  try {
+    return run("claude", ["--version"]).status === 0;
+  } catch {
+    // run() throws when the executable cannot be spawned at all, which is the CI case.
+    return false;
+  }
+}
+
+if (claudeAvailable()) {
   for (const target of [".", ...packageNames.map((name) => `packages/${name}`)]) {
     const result = run("claude", ["plugin", "validate", target]);
     if (result.status !== 0) {
