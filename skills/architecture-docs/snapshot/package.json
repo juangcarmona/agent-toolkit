@@ -18,5 +18,8 @@
     "js-yaml": "5.4.3",
     "jsdom": "27.4.0",
     "marked": "15.0.12"
+  },
+  "scripts": {
+    "test": "node --test ./test/*.test.mjs"
   }
 }

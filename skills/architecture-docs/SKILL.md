@@ -145,7 +145,7 @@ Report the significance decision, files changed, evidence checked, product-inten
 
 ### 9. Publish a shareable snapshot (optional)
 
-When the documentation update is ready for review or reaches a milestone, generate a self-contained, navigable HTML snapshot so stakeholders can browse the full arc42 picture without cloning the repository. The snapshot tool is bundled with this skill at `snapshot/` and reads the same document contract defined above. It renders one file with sidebar navigation, full-text search, pre-rendered Mermaid diagrams, and a Git revision stamp.
+When the documentation update is ready for review or reaches a milestone, generate a self-contained, navigable HTML snapshot so stakeholders can browse the full arc42 picture without cloning the repository. The snapshot tool is bundled with this skill at `snapshot/` and reads the same document contract defined above. It renders a section-card overview, category-coded section navigation, a collapsible desktop sidebar, a responsive mobile drawer, full-text search, pre-rendered Mermaid diagrams, title-led previous/next links, and a Git revision stamp.
 
 ```bash
 # One-time: install locked dependencies without lifecycle scripts
