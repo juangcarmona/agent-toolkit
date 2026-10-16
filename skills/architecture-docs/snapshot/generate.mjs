@@ -115,6 +115,7 @@ async function main() {
   const readmeRendered = await renderMarkdown(docs.readme.body, {
     fileToRoute,
     svgs: take(readmeMermaid.length),
+    title: docs.readme.title,
   });
   const sectionsRendered = [];
   for (let i = 0; i < docs.sections.length; i += 1) {
@@ -123,6 +124,7 @@ async function main() {
       fileToRoute,
       svgs: take(sectionMermaid[i].length),
       currentRoute: `#/section/${section.number}`,
+      title: section.title,
     });
     sectionsRendered.push({
       number: section.number,

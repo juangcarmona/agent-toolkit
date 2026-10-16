@@ -37,11 +37,51 @@ const darkBlock = `  --bg: #16181b;
   --accent: #6cb2eb;
   --accent-soft: #22303c;
   --mark: #6a5b1e;
-  --code-bg: #22252a;`;
+  --code-bg: #22252a;
+  --cat-quality: #6cb2eb;
+  --cat-views: #57c6a1;
+  --cat-concepts: #d4a64b;
+  --cat-other: #9da7b4;`;
+
+const lightBlockWithSectionColors = `${lightBlock}
+  --cat-quality: #0b5cad;
+  --cat-views: #147d64;
+  --cat-concepts: #946200;
+  --cat-other: #6b7078;`;
+
+const SECTION_ICONS = [
+  '<circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="2"/><path d="M8 1v2M15 8h-2M8 15v-2M1 8h2"/>',
+  '<path d="M3 4h10M3 8h10M3 12h10"/><circle cx="6" cy="4" r="1.4"/><circle cx="10" cy="8" r="1.4"/><circle cx="7" cy="12" r="1.4"/>',
+  '<rect x="2" y="3" width="5" height="5" rx="1"/><rect x="9" y="8" width="5" height="5" rx="1"/><path d="M7 5.5h2v5H9"/>',
+  '<circle cx="8" cy="8" r="6"/><path d="m8 2 1.2 5.2L14 8l-5.2 1.2L8 14l-1.2-4.8L2 8l4.8-.8z"/>',
+  '<path d="m2 5 6-3 6 3-6 3zM2 5v6l6 3 6-3V5M8 8v6"/>',
+  '<circle cx="3" cy="8" r="1.5"/><circle cx="13" cy="4" r="1.5"/><circle cx="13" cy="12" r="1.5"/><path d="m4.5 7.5 7-3M4.5 8.5l7 3"/>',
+  '<rect x="2" y="2" width="12" height="4" rx="1"/><rect x="2" y="7" width="12" height="4" rx="1"/><rect x="2" y="12" width="12" height="2" rx="1"/>',
+  '<path d="m8 2 6 3-6 3-6-3zM2 8l6 3 6-3M2 11l6 3 6-3"/>',
+  '<path d="M3 3v10h10M5 10l3-3 2 2 4-5M11 4h3v3"/>',
+  '<path d="M2 12a6 6 0 1 1 12 0M8 10l3-4M4 12h8"/><circle cx="8" cy="10" r="1"/>',
+  '<path d="m8 2 6 11H2zM8 6v3.5M8 11.5v.1"/>',
+  '<path d="M3 2.5h7l3 3V14H3zM10 2.5V6h3M5 8h6M5 10h6M5 12h4"/>',
+];
+
+const SECTION_CODES = ['GOAL', 'CONS', 'CTX', 'STRAT', 'BLDG', 'RUN', 'DEP', 'CONC', 'ADR', 'QUAL', 'RISK', 'TERM'];
+
+function sectionCategory(number) {
+  const n = Number(number);
+  if (n <= 3 || n === 10) return 'quality';
+  if (n >= 5 && n <= 7) return 'views';
+  if (n >= 4 && n <= 9) return 'concepts';
+  return 'other';
+}
+
+function sectionIcon(number) {
+  const index = Number(number) - 1;
+  return `<svg viewBox="0 0 16 16" aria-hidden="true">${SECTION_ICONS[index] ?? SECTION_ICONS[11]}</svg>`;
+}
 
 const style = `
 :root {
-${lightBlock}
+${lightBlockWithSectionColors}
   --sans: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif;
   --mono: ui-monospace, SFMono-Regular, 'SF Mono', 'Cascadia Mono', Consolas, 'Liberation Mono', Menlo, monospace;
   color-scheme: light;
@@ -58,6 +98,7 @@ ${darkBlock}
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
+.visually-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 html, body { height: 100%; }
 body {
   margin: 0; display: flex; flex-direction: column; overflow: hidden;
@@ -111,8 +152,9 @@ header.site .spacer { flex: 1; }
 /* ---- Layout ---- */
 #shell { flex: 1 1 auto; min-height: 0; display: flex; }
 aside.nav {
-  flex: none; width: 17.5rem; overflow-y: auto; border-right: 1px solid var(--line);
+  position:relative; flex:none; width:17.5rem; overflow-y:auto; border-right:1px solid var(--line);
   background: var(--panel); padding: 0.9rem 0.75rem;
+  transition:width .18s ease,padding .18s ease;
 }
 main#main { flex: 1 1 auto; min-width: 0; overflow-y: auto; padding: 1.4rem 2.2rem 4rem; scroll-behavior: smooth; }
 .doc { max-width: 78ch; margin: 0 auto; }
@@ -120,20 +162,36 @@ main#main { flex: 1 1 auto; min-width: 0; overflow-y: auto; padding: 1.4rem 2.2r
 p.doc-desc { margin: 0 0 1.2rem; color: var(--muted); font-size: 0.9rem; }
 
 /* ---- Sidebar ---- */
-aside.nav h2 { margin: 0 0 0.5rem; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+aside.nav .nav-heading { display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin:0 0 .5rem; }
+aside.nav h2 { margin:0; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
 aside.nav ol { list-style: none; margin: 0; padding: 0; }
 aside.nav li { margin: 0; border-bottom: 1px solid var(--line); }
 aside.nav a {
-  display: flex; gap: 0.55rem; align-items: baseline; padding: 0.32rem 0.4rem;
+  display:flex; gap:.55rem; align-items:center; padding:.32rem .4rem;
   color: var(--text); border-left: 2px solid transparent;
 }
 aside.nav a:hover { color: var(--ink); text-decoration: none; background: var(--raise); }
 aside.nav a[aria-current='page'] { color: var(--ink); border-left-color: var(--accent); background: var(--raise); }
-aside.nav .num { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); flex: none; }
-aside.nav .t { flex: 1 1 auto; min-width: 0; font-size: 0.86rem; }
+aside.nav .nav-icon { display:inline-flex; flex:none; width:1rem; height:1rem; color:var(--category); }
+aside.nav .nav-icon svg, .prevnext svg { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+aside.nav a[data-category="quality"], .prevnext a[data-category="quality"] { --category:var(--cat-quality); }
+aside.nav a[data-category="views"], .prevnext a[data-category="views"] { --category:var(--cat-views); }
+aside.nav a[data-category="concepts"], .prevnext a[data-category="concepts"] { --category:var(--cat-concepts); }
+aside.nav a[data-category="other"], .prevnext a[data-category="other"] { --category:var(--cat-other); }
+aside.nav .nav-code { display:none; font:600 .58rem/1 var(--mono); color:var(--category); }
+aside.nav .t { flex:1 1 auto; min-width:0; font-size:.86rem; }
 .nav-foot { margin-top: 1rem; padding-top: 0.6rem; border-top: 1px solid var(--line); font-size: 0.78rem; color: var(--muted); }
 .nav-foot .prevnext { display: flex; justify-content: space-between; gap: 0.5rem; }
 .nav-foot .prevnext a { font-size: 0.78rem; }
+.prevnext a { display:flex; align-items:flex-start; gap:.35rem; max-width:48%; color:var(--category); }
+.prevnext .nav-icon { display:inline-flex; width:.9rem; height:.9rem; flex:none; margin-top:.15rem; }
+body.nav-collapsed aside.nav { width:4.25rem; padding:.9rem .55rem; }
+body.nav-collapsed aside.nav .nav-heading { justify-content:center; }
+body.nav-collapsed aside.nav h2, body.nav-collapsed aside.nav .nav-title, body.nav-collapsed aside.nav .nav-foot { display:none; }
+body.nav-collapsed aside.nav a { flex-direction:column; gap:.12rem; align-items:center; padding:.48rem .15rem; }
+body.nav-collapsed aside.nav .nav-icon { width:1.2rem; height:1.2rem; }
+body.nav-collapsed aside.nav .nav-code { display:block; }
+.mobile-nav-toggle, #nav-close, #nav-backdrop { display:none; }
 
 /* ---- Content ---- */
 .doc h3 { margin: 1.6rem 0 0.5rem; font-size: 1.12rem; border-bottom: 1px solid var(--line); padding-bottom: 0.25rem; }
@@ -195,10 +253,20 @@ kbd {
 .toast.show { opacity: 1; }
 
 /* ---- Narrow viewports ---- */
-@media (max-width: 860px) {
-  #shell { flex-direction: column; }
-  aside.nav { width: auto; max-height: 32vh; border-right: none; border-bottom: 1px solid var(--line); }
-  main#main { padding: 1rem 1rem 3rem; }
+@media (max-width: 900px) {
+  header.site .mobile-nav-toggle { display:inline-flex; }
+  #shell { position:relative; }
+  aside.nav { position:absolute; z-index:25; inset:0 auto 0 0; width:min(19rem,86vw); transform:translateX(-105%); transition:transform .2s ease; box-shadow:0 12px 36px rgba(0,0,0,.28); }
+  body.mobile-nav-open aside.nav { transform:translateX(0); }
+  #nav-close { display:inline-flex; }
+  #nav-backdrop { position:absolute; z-index:24; inset:0; display:block; border:0; background:rgba(0,0,0,.48); }
+  body.nav-collapsed aside.nav { width:min(19rem,86vw); padding:.9rem .75rem; }
+  body.nav-collapsed aside.nav .nav-heading { justify-content:space-between; }
+  body.nav-collapsed aside.nav h2, body.nav-collapsed aside.nav .nav-title, body.nav-collapsed aside.nav .nav-foot { display:block; }
+  body.nav-collapsed aside.nav a { flex-direction:row; gap:.55rem; align-items:center; padding:.32rem .4rem; }
+  body.nav-collapsed aside.nav .nav-icon { width:1rem; height:1rem; }
+  body.nav-collapsed aside.nav .nav-code { display:none; }
+  main#main { padding:1rem 1rem 3rem; }
 }
 @media (max-width: 520px) {
   header.site { flex-wrap: wrap; gap: 0.5rem; }
@@ -206,6 +274,21 @@ kbd {
   header.site .spacer { display: none; }
   header.site .appearance { margin-left: auto; }
 }
+.overview-intro { max-width:62rem; margin:0 auto 1.6rem; }
+.overview-intro h2 { margin:0 0 .4rem; font-size:clamp(1.7rem,3vw,2.5rem); }
+.overview-intro p { margin:0; color:var(--muted); font-size:1.05rem; }
+.section-cards { display:grid; grid-auto-flow:column; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:repeat(6,minmax(5rem,auto)); gap:.7rem; max-width:75rem; margin:auto; }
+.section-card { display:flex; align-items:flex-start; gap:.85rem; min-height:5rem; padding:.9rem 1rem; color:var(--ink); border:1px solid var(--line); border-radius:7px; background:color-mix(in srgb,var(--category) 9%,var(--raise)); }
+.section-card:hover { border-color:var(--category); text-decoration:none; }
+.section-card[data-category="quality"] { --category:var(--cat-quality); }
+.section-card[data-category="views"] { --category:var(--cat-views); }
+.section-card[data-category="concepts"] { --category:var(--cat-concepts); }
+.section-card[data-category="other"] { --category:var(--cat-other); }
+.section-card .card-number { display:grid; place-items:center; width:2rem; height:2rem; flex:none; border-radius:50%; background:var(--category); color:#fff; font-weight:700; }
+.section-card strong { display:block; color:var(--ink); font-size:1rem; }
+.section-card small { display:block; margin-top:.2rem; color:var(--muted); font-size:.83rem; }
+.overview-details { max-width:75rem; margin:2rem auto 0; }
+@media(max-width:650px) { .section-cards { grid-auto-flow:row; grid-template-columns:1fr; grid-template-rows:none; } }
 @media print {
   body { overflow: visible; }
   aside.nav, header.site .appearance, header.site .iconbtn { display: none; }
@@ -293,7 +376,31 @@ const script = String.raw`
   }
 
   function showOverview(host) {
-    renderDoc(host, README.title || 'Overview', README.description || '', README.html || '');
+    clear(host);
+    var intro = el('section', 'overview-intro');
+    intro.appendChild(el('h2', null, README.title || 'Architecture overview'));
+    if (README.description) intro.appendChild(el('p', null, README.description));
+    host.appendChild(intro);
+    var cards = el('div', 'section-cards');
+    for (var i = 0; i < SECTIONS.length; i += 1) {
+      var section = SECTIONS[i];
+      var card = doc.createElement('a');
+      card.className = 'section-card';
+      card.href = '#/section/' + section.number;
+      card.setAttribute('data-category', section.category);
+      card.appendChild(el('span', 'card-number', String(Number(section.number))));
+      var copy = el('span');
+      copy.appendChild(el('strong', null, section.title));
+      copy.appendChild(el('small', null, section.description || 'Explore this architecture section.'));
+      card.appendChild(copy);
+      cards.appendChild(card);
+    }
+    host.appendChild(cards);
+    if (README.html) {
+      var details = el('section', 'overview-details');
+      details.innerHTML = README.html; /* generator-escaped markdown output only */
+      host.appendChild(details);
+    }
   }
 
   function showSection(host, number) {
@@ -320,7 +427,7 @@ const script = String.raw`
       host.appendChild(box);
       return;
     }
-    renderDoc(host, section.number + ' · ' + section.title, section.description, section.html || '');
+    renderDoc(host, section.title, section.description, section.html || '');
   }
 
   /* ---------- Sidebar state ---------- */
@@ -335,18 +442,29 @@ const script = String.raw`
     var number = m ? m[1] : null;
     var prev = doc.getElementById('nav-prev');
     var next = doc.getElementById('nav-next');
-    var set = function (a, target, label) {
+    var set = function (a, target, direction) {
       clear(a);
-      if (!target) { a.style.visibility = 'hidden'; return; }
+      if (!target) {
+        a.style.visibility = 'hidden';
+        a.setAttribute('aria-label', direction === 'previous' ? 'Previous section' : 'Next section');
+        return;
+      }
       a.style.visibility = 'visible';
       a.href = '#/section/' + target.number;
-      a.textContent = label + ' ' + target.number + ' · ' + target.title;
+      a.setAttribute('aria-label', (direction === 'previous' ? 'Previous: ' : 'Next: ') + target.title);
+      a.setAttribute('data-category', target.category);
+      var icon = el('span', 'nav-icon');
+      icon.innerHTML = direction === 'previous'
+        ? '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="m10 3-5 5 5 5"/></svg>'
+        : '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg>';
+      a.appendChild(icon);
+      a.appendChild(el('span', null, target.title));
     };
     if (number) {
       var pos = -1;
       for (var s = 0; s < SECTIONS.length; s += 1) if (SECTIONS[s].number === number) pos = s;
-      set(prev, pos > 0 ? SECTIONS[pos - 1] : null, '\u2190');
-      set(next, pos >= 0 && pos < SECTIONS.length - 1 ? SECTIONS[pos + 1] : null, '\u2192');
+      set(prev, pos > 0 ? SECTIONS[pos - 1] : null, 'previous');
+      set(next, pos >= 0 && pos < SECTIONS.length - 1 ? SECTIONS[pos + 1] : null, 'next');
     } else {
       set(prev, null); set(next, null);
     }
@@ -455,6 +573,7 @@ const script = String.raw`
       }
       return;
     }
+    if (event.key === 'Escape' && doc.body.classList.contains('mobile-nav-open')) { closeMobileNav(); event.preventDefault(); return; }
     if (typing) return;
     if (event.key === '/') { openFind(); event.preventDefault(); }
     else if (event.key === '?') { doc.getElementById('keys').hidden = false; event.preventDefault(); }
@@ -467,6 +586,16 @@ const script = String.raw`
       var pv = doc.getElementById('nav-prev');
       if (pv && pv.style.visibility !== 'hidden') location.hash = pv.getAttribute('href');
     }
+  }
+
+  var mobileNavReturnFocus = null;
+  function closeMobileNav() {
+    doc.body.classList.remove('mobile-nav-open');
+    var toggle = doc.getElementById('mobile-nav-toggle');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    doc.getElementById('nav-backdrop').hidden = true;
+    if (mobileNavReturnFocus && typeof mobileNavReturnFocus.focus === 'function') mobileNavReturnFocus.focus();
+    mobileNavReturnFocus = null;
   }
 
   /* ---------- Toast ---------- */
@@ -486,6 +615,25 @@ const script = String.raw`
   doc.getElementById('keys-open').addEventListener('click', function () { doc.getElementById('keys').hidden = false; });
   doc.getElementById('keys-close').addEventListener('click', function () { doc.getElementById('keys').hidden = true; });
   doc.getElementById('keys').addEventListener('click', function (event) { if (event.target === this) this.hidden = true; });
+  doc.getElementById('nav-collapse').addEventListener('click', function () {
+    doc.body.classList.toggle('nav-collapsed');
+    var expanded = !doc.body.classList.contains('nav-collapsed');
+    this.setAttribute('aria-expanded', String(expanded));
+    this.setAttribute('aria-label', expanded ? 'Collapse navigation' : 'Expand navigation');
+    this.title = expanded ? 'Collapse navigation' : 'Expand navigation';
+  });
+  doc.getElementById('mobile-nav-toggle').addEventListener('click', function () {
+    mobileNavReturnFocus = this;
+    doc.body.classList.add('mobile-nav-open'); this.setAttribute('aria-expanded', 'true');
+    doc.getElementById('nav-backdrop').hidden = false;
+    var firstLink = doc.querySelector('#arc42-nav a');
+    if (firstLink) firstLink.focus();
+  });
+  doc.getElementById('nav-close').addEventListener('click', closeMobileNav);
+  doc.getElementById('nav-backdrop').addEventListener('click', closeMobileNav);
+  doc.querySelector('aside.nav ol').addEventListener('click', function (event) {
+    if (event.target.closest('a')) closeMobileNav();
+  });
   var findInput = doc.getElementById('find-input');
   findInput.addEventListener('input', function () { runSearch(findInput.value); });
   var appearanceButtons = doc.querySelectorAll('.appearance button');
@@ -521,7 +669,7 @@ export function buildSnapshotHtml({ readme, sections, stackName, revision }) {
   const navItems = sections
     .map(
       (s) =>
-        `        <li><a href="#/section/${s.number}" data-route="#/section/${s.number}"><span class="num">${s.number}</span><span class="t">${esc(s.title)}</span></a></li>`,
+        `        <li><a href="#/section/${s.number}" data-route="#/section/${s.number}" data-category="${sectionCategory(s.number)}"><span class="nav-icon">${sectionIcon(s.number)}</span><span class="nav-title t">${esc(s.title)}</span><span class="nav-code">${SECTION_CODES[Number(s.number) - 1]}</span></a></li>`,
     )
     .join('\n');
 
@@ -532,6 +680,7 @@ export function buildSnapshotHtml({ readme, sections, stackName, revision }) {
       title: s.title,
       description: s.description,
       html: s.html,
+      category: sectionCategory(s.number),
     })),
   };
 
@@ -558,13 +707,14 @@ export function buildSnapshotHtml({ readme, sections, stackName, revision }) {
     '  <button type="button" data-appearance-set="dark" aria-pressed="false">Dark</button>',
     '</div>',
     '<button type="button" class="iconbtn" id="ov-find" aria-haspopup="dialog" aria-label="Search (/)" title="Search (/)">\u2315</button>',
+    '<button type="button" class="iconbtn mobile-nav-toggle" id="mobile-nav-toggle" aria-controls="arc42-nav" aria-expanded="false" aria-label="Open sections navigation" title="Open navigation">☰</button>',
     '<button type="button" class="iconbtn" id="keys-open" aria-haspopup="dialog" aria-label="Keyboard shortcuts (?)" title="Keyboard shortcuts (?)">?</button>',
     '</header>',
     '<div id="shell">',
-    '<aside class="nav" aria-label="arc42 sections">',
-    '  <h2>Sections</h2>',
+    '<aside class="nav" id="arc42-nav" aria-label="arc42 sections">',
+    '  <div class="nav-heading"><h2>Sections</h2><button type="button" class="iconbtn" id="nav-collapse" aria-label="Collapse navigation" aria-expanded="true" title="Collapse navigation">◧</button><button type="button" class="iconbtn" id="nav-close" aria-label="Close navigation" title="Close navigation">×</button></div>',
     '  <ol>',
-    `    <li><a href="#/" data-route="#/"><span class="num">—</span><span class="t">Overview (README)</span></a></li>`,
+    `    <li><a href="#/" data-route="#/" data-category="other"><span class="nav-icon"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m2 7 6-5 6 5v7H9v-4H7v4H2z"/></svg></span><span class="nav-title t">Overview</span><span class="nav-code">HOME</span></a></li>`,
     navItems,
     '  </ol>',
     '  <div class="nav-foot">',
@@ -574,18 +724,21 @@ export function buildSnapshotHtml({ readme, sections, stackName, revision }) {
     '    </div>',
     '  </div>',
     '</aside>',
+    '<button type="button" id="nav-backdrop" aria-label="Close navigation" hidden></button>',
     '<main id="main">',
     '  <div id="content"></div>',
     '</main>',
     '</div>',
     '<div class="dlg" id="find" role="dialog" aria-modal="true" aria-labelledby="find-title" hidden>',
     '<div class="dlgbox">',
+    '  <h2 class="visually-hidden" id="find-title">Search architecture</h2>',
     `  <input id="find-input" type="text" placeholder="Search ${esc(stackName)} docs…" aria-label="Search query" autocomplete="off">`,
     '  <ul id="find-results"></ul>',
     '</div>',
     '</div>',
     '<div class="dlg" id="keys" role="dialog" aria-modal="true" aria-labelledby="keys-title" hidden>',
     '<div class="dlgbox keysbox">',
+    '  <h2 class="visually-hidden" id="keys-title">Keyboard shortcuts</h2>',
     '  <input type="text" value="Keyboard shortcuts" aria-label="Keyboard shortcuts" readonly>',
     '  <dl>',
     '    <dt><kbd>/</kbd></dt><dd>Search the overview and all sections</dd>',

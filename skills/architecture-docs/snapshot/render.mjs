@@ -109,6 +109,33 @@ function isMermaid(lang) {
   return String(lang ?? '').trim().split(/\s+/)[0] === 'mermaid';
 }
 
+function normalizedHeading(text) {
+  return String(text ?? '')
+    .replace(/^\s*\d{1,2}[.)]\s*/, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLocaleLowerCase();
+}
+
+/** Remove a leading H1 that repeats the title already rendered from frontmatter. */
+export function stripDuplicateTitle(body, title) {
+  if (!title) return body;
+  const marked = new Marked({ gfm: true });
+  const tokens = marked.lexer(body);
+  let offset = 0;
+  for (const token of tokens) {
+    if (token.type === 'space' || (token.type === 'html' && /^\s*<!--[\s\S]*-->\s*$/.test(token.text))) {
+      offset += token.raw.length;
+      continue;
+    }
+    if (token.type === 'heading' && token.depth === 1 && normalizedHeading(token.text) === normalizedHeading(title)) {
+      return body.slice(0, offset) + body.slice(offset + token.raw.length);
+    }
+    break;
+  }
+  return body;
+}
+
 function createMarked(fileToRoute, svgs, currentRoute) {
   const marked = new Marked({ gfm: true });
   const slugger = new GithubSlugger();
@@ -117,6 +144,7 @@ function createMarked(fileToRoute, svgs, currentRoute) {
   marked.use({
     renderer: {
       html({ text }) {
+        if (/^\s*<!--[\s\S]*-->\s*$/.test(text)) return '';
         return escapeHtml(text);
       },
       heading({ tokens, depth }) {
@@ -173,13 +201,14 @@ function createMarked(fileToRoute, svgs, currentRoute) {
  *
  * @param {string} body markdown source (frontmatter already stripped)
  * @param {object} opts
+ * @param {string} opts.title frontmatter title, used to suppress a repeated leading H1
  * @param {Map<string,string>} opts.fileToRoute section file name -> hash route
  * @param {string[]} opts.svgs pre-rendered mermaid SVGs for this document
  * @param {string} opts.svgClass css class for inline svg wrappers
  */
-export async function renderMarkdown(body, { fileToRoute, svgs = [], currentRoute = '#/' }) {
+export async function renderMarkdown(body, { fileToRoute, svgs = [], currentRoute = '#/', title = '' }) {
   const renderer = createMarked(fileToRoute, svgs, currentRoute);
-  const html = await renderer.marked.parse(body);
+  const html = await renderer.marked.parse(stripDuplicateTitle(body, title));
   if (renderer.count() !== svgs.length) throw new Error('Unused Mermaid SVGs: Markdown extraction and rendering disagree');
   return { html, mermaidCount: renderer.count() };
 }
