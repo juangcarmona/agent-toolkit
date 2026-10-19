@@ -1,5 +1,5 @@
 name: agentic-sdlc
-version: 0.2.0
+version: 0.2.1
 description: "An adaptive development lifecycle for agent-driven delivery: readiness and verification gates, deterministic checks, and explicit human approval."
 author: juangcarmona
 license: MIT
