@@ -1,6 +1,6 @@
 ---
 name: adopt
-description: "Bootstrap or reconcile a project's lifecycle configuration: Definition of Ready, Definition of Done, role capabilities. Use when onboarding a repository, or after its tooling, roles or process changed."
+description: "Bootstrap, reconcile, or explicitly reset a project's lifecycle configuration to the shared defaults. Use when onboarding, when repository tooling changes, or when the user requests `adopt defaults`."
 metadata:
   plugin: agentic-sdlc
   author: "juangcarmona"
@@ -10,7 +10,7 @@ metadata:
 
 Establish and keep current this project's lifecycle configuration, `docs/engineering-lifecycle.md`, and the role capabilities that go with it. Discover how the team already works and write that down; never impose a tracker, a forge, a CI system or a methodology.
 
-Run in one of two modes, detected from the repository rather than asked for. **Bootstrap** when no configuration exists. **Reconcile** when it does. Reconcile is the normal mode for the life of the project.
+Run in one of three modes. **Bootstrap** when no configuration exists, **reconcile** when it does, or **defaults** when the user explicitly invokes `adopt defaults`. Reconcile preserves established project choices. Defaults replaces the previous Agentic SDLC configuration and installed role adaptations with the shared defaults, while carrying forward facts that still describe the repository.
 
 The configuration belongs to the project once bootstrap has run. The templates in `assets/role-skills/` are starting points, not authoritative copies, so reconcile works against what the project has made of them and preserves customisation by default.
 
@@ -21,6 +21,7 @@ The configuration belongs to the project once bootstrap has run. The templates i
 - The team's roles, policies or engineering process changed.
 - A lifecycle capability stopped and reported that no configuration exists.
 - Periodically, to find Definition of Done items that can move from the judgement lane to the deterministic lane.
+- Resetting prior Agentic SDLC lifecycle choices and installing the shared defaults with `adopt defaults`.
 
 ## When not to use
 
@@ -30,13 +31,35 @@ The configuration belongs to the project once bootstrap has run. The templates i
 
 ## Workflow
 
-Every write, in either mode, is shown to a human and confirmed before it happens. This capability fires no tracker transition, merges nothing, deletes nothing, and runs no destructive command.
+Bootstrap and reconcile show each proposed write and wait for confirmation. The explicit `adopt defaults` invocation authorizes the bounded reset described below without a second confirmation. Adoption never merges a pull request or deploys software.
+
+Adoption is idempotent: applying the shared standard to an already-conforming repository produces no changes. Reconcile existing names, descriptions, workflows, and repository-specific conventions before proposing edits. Preserve existing labels and their meaning; never rename, delete, recolor, or repurpose a label with existing usage. Add only missing shared labels, and report conflicts where a name already means something else. Optional labels are installed only when the repository's workflow uses them.
 
 ### 1. Detect the mode
 
-Read `docs/engineering-lifecycle.md`. Absent means **bootstrap**. Present means **reconcile**. State which mode is running before doing anything else.
+Read the invocation and `docs/engineering-lifecycle.md`. An explicit `defaults` argument means **defaults**; otherwise absent configuration means **bootstrap** and present configuration means **reconcile**. State which mode is running before doing anything else.
 
 *Done when:* the mode is named out loud.
+
+If the mode is **defaults**, complete the reset workflow below and then report. Bootstrap and reconcile continue through the remaining numbered workflow.
+
+### Defaults mode: replace the previous adoption
+
+Run this branch only for the explicit `adopt defaults` invocation. The invocation is the user's authorization to reset the listed lifecycle artifacts.
+
+1. Run the repository discovery in step 2 without asking for lifecycle preferences; use the shared defaults for those choices.
+2. Read the existing **Installed roles** table and inventory `docs/engineering-lifecycle.md`, every listed source under `.agents/skills/`, and the corresponding generated copies under harness directories recorded by that table. If no lifecycle file exists, the prior owned-file list is empty.
+3. Replace `docs/engineering-lifecycle.md` with the current package template, populated from repository files and live tooling. Carry forward verified product-specific Ready/Done requirements, CI checks, role identities, issue fields, and spec-tool mappings. Replace prior label, review-record, transition, and Fast Forward conventions with the shared defaults below.
+4. Replace the listed Agentic SDLC role sources with freshly adapted package defaults, then regenerate only their recorded harness copies. Remove a listed role only when the new defaults no longer require it. Do not remove a file that is absent from the prior Installed roles table.
+5. Set the retrospective baseline date to today. Preserve prior retrospective files, log entries, PR comments, and process ledgers as historical records; do not bulk-convert or delete them. `status` reports review debt only for merges on or after this baseline.
+6. For GitHub, add any missing canonical `status:*` labels. Map recognized legacy labels using [`references/github-label-standard.md`](references/github-label-standard.md). For issues with no state label, inspect linked PR state and branch evidence: plan-only drafts are `proposed`, implementation drafts are `in-progress`, ready PRs are `in-review`, active implementation branches are `in-progress`, and issues with no evidence of active work are `backlog`. Reread each issue immediately before the update, preserve every unrelated label, and verify the result. Leave ambiguous issues, issues with conflicting state labels, and all closed issues unchanged; report them. Never delete a GitHub label.
+7. Preserve all files outside the lifecycle configuration and the previously listed role sources/copies. In particular, keep `AGENTS.md`, issue and PR forms, product and architecture sources, ADRs, process ledgers, and unrelated harness skills.
+
+The shared defaults are: one `status:*` label per open work item; a per-item retrospective at `docs/reviews/issue-<number>.md` for merges on or after the adoption baseline; a separate existing process ledger only for cross-item improvements; and enabled `/ff` using the existing stage capabilities, a distinct runtime-selected reviewer model, three correction rounds, and run evidence under `docs/delivery/ff/<work-item-id>/<run-id>/`. `/ff` may create/update a PR, push its branch, and merge only after every configured gate passes and the forge permits it. Human-only decisions, required human approvals, deployment, and repository red lines still stop the run.
+
+If live tooling cannot resolve a field, preserve the package default where one is defined; otherwise record `unresolved` and report the exact next action. Never invent a project fact to make the reset appear complete.
+
+*Done when:* the prior listed adoption artifacts have been replaced by the shared defaults, recognized open issues have exactly one canonical lifecycle status, and every ambiguous or unavailable item is reported.
 
 ### 2. Discover before asking, in both modes
 
@@ -47,6 +70,8 @@ Resolve everything the repository and its tooling can answer, and bring findings
 - whether a specification tool is present;
 - the harness directories already in the repository (`.agents/skills/`, `.claude/skills/`);
 - any role capabilities a previous run installed.
+- the existing issue and pull request templates, label names, descriptions, colors, and usage; do not assume a tracker feature is configured just because the forge supports it;
+- process-ledger location and history, including prior conflict resolutions and any existing lint or append-only convention.
 
 *Done when:* every discoverable fact is in hand and the human has seen the list.
 
@@ -74,6 +99,8 @@ Then the closing question again, for what the reference does not cover.
 
 The stage-to-state mapping, the transitions each stage fires, the fields each transition's screen requires, whether the team caps work in progress, whether they commit to sprints.
 
+For GitHub, use [`references/github-label-standard.md`](references/github-label-standard.md) as a shared vocabulary, not as a mandate to create every label. Mark each listed label **shared** or **optional**, verify existing use and map each stage to the repository's current workflow. For other trackers or forges, map the same lifecycle semantics to their native concepts without requiring GitHub labels.
+
 **Every identifier is resolved from live tooling in this session.** A transition id transcribed from a diagram or from memory breaks the loop a month later, and the failure will look like something else entirely.
 
 *Done when:* every value in the mapping was verified against the real system.
@@ -85,6 +112,7 @@ Read the configuration, its Definition of Ready and Definition of Done, the inst
 - **Missing capabilities**: roles the team's current practice needs that are not installed.
 - **Stale assumptions**: values that no longer resolve against live tooling, such as a moved tracker, a transition id that has gone, a check that disappeared from the pipeline, or a role nobody fills.
 - **Improvements**: the most valuable being Definition of Done items that can move from the judgement lane to the deterministic lane, now that tooling exists which did not before.
+- **Lifecycle-standard drift**: missing shared labels or conventions, optional labels that are not used, and any repository-specific choice that should be retained. Existing usage takes precedence over cosmetic standardization.
 
 Report what is drifting even when nothing needs changing. A clean reconcile is a useful result.
 
@@ -97,6 +125,8 @@ Nothing in an established configuration changes without a shown diff and an expl
 - Preserve project customisation. Where a template has moved on and the project has adapted its copy, show both and let the human choose; never regenerate over the adaptation.
 - A role capability a previous run installed that the project no longer needs is **reported, not deleted**.
 - Decline is a valid answer and is recorded in the amendment log with its reason.
+- For labels in bootstrap or reconcile, show the exact missing labels and metadata before creating them. Keep optional labels opt-in, and leave conflicting or already-used labels untouched until the project owner resolves their semantics. Defaults mode uses the canonical lifecycle migration described above and never deletes forge labels.
+- For issue and pull request conventions, propose additive template or documentation changes only when the current convention has a demonstrated gap. Do not replace project-specific wording or fields merely to match the reference.
 
 *Done when:* every proposed change was confirmed or declined, and nothing was written that was not confirmed.
 
@@ -108,6 +138,8 @@ For each required role (`read-work-item`, `transition-work-item`, `open-pull-req
 2. Pick the reference matching this project's tooling.
 3. Adapt it, replacing every placeholder with a verified value.
 4. Write it to `.agents/skills/<role>/SKILL.md`, renamed from `SKILL.template.md`. That file is the source the project owns.
+
+Installed role skills must honor the explicit Fast Forward authorization recorded in `## Fast Forward`: routine writes may proceed without per-write confirmation only when called by an enabled `/ff` run. They still refuse any human-only transition, protected merge, production action, or other repository red line.
 
 Where no reference matches, author against the contract following [`references/adapting-role-templates.md`](references/adapting-role-templates.md) and **record that it was authored, not adapted**. A fabricated reference is worse than a missing one, because everything downstream trusts it.
 
@@ -125,15 +157,21 @@ Whether the copies are committed is the project's decision and follows how it al
 
 *Done when:* every installed role is reachable from every harness the team runs, and the team knows which files are source and which are copies.
 
-### 10. Write the configuration
+### 10. Configure Fast Forward when requested
 
-Fill [`assets/engineering-lifecycle.md`](assets/engineering-lifecycle.md) and write it to `docs/engineering-lifecycle.md`. Show it and confirm before writing. In reconcile mode, write only the confirmed sections and append to the amendment log.
+Fast Forward is opt-in. Ask whether the project wants unattended execution; default to **disabled**. If enabled, resolve the executor and independent review model through the project's actual harness, confirm they differ, choose a bounded correction limit, and identify durable evidence storage. Record which judgement gates an independent agent may decide and which still require a human or forge-protected approval. Never configure a model name from memory or claim independence when the harness cannot attest it.
+
+*Done when:* the project has either recorded Fast Forward as disabled or supplied every required setting and stop condition.
+
+### 11. Write the configuration
+
+Fill [`assets/engineering-lifecycle.md`](assets/engineering-lifecycle.md) and write it to `docs/engineering-lifecycle.md`. In bootstrap and reconcile modes, show it and confirm before writing; in defaults mode, the explicit invocation authorizes the bounded replacement. In reconcile mode, write only the confirmed sections and append to the amendment log.
 
 Its section headings are a **contract**: every lifecycle capability locates what it needs by heading. Headings are never renamed or removed, even when a section is empty. The full contract, including which capability reads which section, is in [`references/configuration-contract.md`](references/configuration-contract.md).
 
 This file is the adopted lifecycle contract. It is not `CLAUDE.md`, `AGENTS.md` or a Copilot instructions file. Those are harness context files; one may point at the configuration but never replaces it.
 
-### 11. Report
+### 12. Report
 
 What was installed or changed, what was detected and declined and why, what needs doing by hand such as a board's own column limits which no tooling reaches, which files are copies, and what to run next. Name the next capability; do not run it.
 
@@ -143,12 +181,14 @@ What was installed or changed, what was detected and declined and why, what need
 
 - The mode was detected from the repository and stated, not guessed or asked for.
 - Every value written was resolved from live tooling in this session.
-- Every file write was shown and confirmed before it happened.
-- In reconcile mode, no established configuration or adapted capability was overwritten without a shown diff and a confirmation.
+- Every bootstrap and reconcile file write was shown and confirmed; defaults mode replaced only the inventoried lifecycle configuration and role files it owned.
+- In reconcile mode, no established configuration or adapted capability was overwritten without a shown diff and a confirmation. Defaults mode replaced the prior configuration and role adaptations listed by its Installed roles table.
 - `docs/engineering-lifecycle.md` carries every contract heading, including the empty ones.
 - Every installed role capability resolves from every harness directory the team runs.
 - The **Installed roles** table lists what exists, with what each was adapted from.
-- No transition was fired and no knowledge base was touched.
+- Bootstrap and reconcile fired no tracker transition. Defaults mode changed only recognized lifecycle labels on open issues and left ambiguous and closed issues unchanged. No knowledge base was touched.
+- A second adoption pass with no repository drift proposes no duplicate labels, repeated template edits, or configuration churn.
+- Existing label names, semantics, and usage were preserved; every optional label has a repository-specific reason to exist.
 
 ## Common pitfalls
 

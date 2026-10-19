@@ -1,18 +1,18 @@
 # transition-work-item: GitHub Issues
 
-The lifecycle state is not GitHub's `state`. It is a label or a Projects single-select field: resolve which during adoption.
+The lifecycle state is not GitHub's `state`. Under the shared defaults it is exactly one `status:*` label; ordinary adoption records the verified mapping if the repository uses another store.
 
 ## Labels
 
 ```bash
-# Read the current state labels first and validate the transition
+# Read the current state labels first and validate the configured transition
 gh issue view <number> --json labels --jq '.labels[].name | select(startswith("status:"))'
 
 # Only then apply the transition
 gh issue edit <number> --remove-label "status:<from>" --add-label "status:<to>"
 ```
 
-Read and validate the current state immediately before applying the label change. If the issue has moved, carries multiple state labels, or has no current lifecycle label, do not apply the transition: report the mismatch and stop. Applying a target label unconditionally can create a transition from an invalid state and leave downstream queries ambiguous. Remove the old state label in the same call. Two state labels on one issue makes every downstream query ambiguous, and nothing in GitHub prevents it.
+Read and validate the current state immediately before applying the label change. If the issue has moved, carries zero or multiple current state labels, or the requested transition is not allowed by `docs/engineering-lifecycle.md`, report the mismatch and stop. Remove the old status label and add the new one in the same call. Reread the issue and verify exactly one `status:*` label remains.
 
 ## Projects single-select
 

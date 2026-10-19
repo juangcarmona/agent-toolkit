@@ -18,6 +18,7 @@ Run `npm run setup:snapshot` to install the snapshot runtime from its own lockfi
 | Markdown | `npm run lint:markdown` | CommonMark style, structural Markdown rules, and one-paragraph-per-line authoring. |
 | Agent Skills specification | `npm run validate:skills` | Official `agentskills` reference CLI checks for frontmatter and naming, followed by canonical placement, uniqueness, and no-symlink rules. |
 | Links | `npm run validate:links` | Existence of relative Markdown link targets without making network-dependent external link checks part of CI. |
+| Lifecycle package invariants | `npm run validate:lifecycle` | Canonical status labels, idempotent reconcile and explicit defaults reset, per-item retrospective records, Fast Forward composition and safety boundaries, and status reporting of durable run decisions. |
 | Snapshot | `npm run validate:snapshot` | Audit the locked snapshot runtime and run repository-only regressions for HTML safety, document completeness, Markdown/SVG rendering, navigation, and CLI behavior. |
 | skills CLI | `npm run validate:discovery` | Discovery of every canonical skill, selected-skill installation with provenance lock generation, and complete-collection installation through the pinned Vercel CLI. |
 | APM | `npm run validate:packages` | Offline portable-plugin pack, compatibility-bundle installation into a temporary Copilot consumer, shared-path projection, byte-for-byte source comparison, and CI audit. |

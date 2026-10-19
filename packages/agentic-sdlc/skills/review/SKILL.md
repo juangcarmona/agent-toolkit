@@ -35,8 +35,8 @@ Invoke deliberately. `integrate` offers this stage; it never runs it. This stage
 1. **Load the configuration.** Read `docs/engineering-lifecycle.md`. Absent means stop and say to run `adopt` first.
 2. **Look at what happened after the merge**: the pipeline on the target branch via `inspect-ci-result`, the deploy outcome where the project has one, and anything reported since. This is the material a pre-merge retrospective cannot have.
 3. **Measure the effort** via `collect-usage`. Missing telemetry is reported as missing, never replaced with a plausible figure, because every summary built on the log afterwards inherits the lie.
-4. **Draft the reflections** from what actually happened: the commit narrative, the blockers hit, the review findings, the gate that fired or failed to. Lead with a draft for the human to correct. A cold "how did it go?" gets a shrug.
-5. **Record it** via `review-entry`. Append-only.
+4. **Draft the reflections** from what actually happened: the commit narrative, the blockers hit, the review findings, the gate that fired or failed to. In normal mode, lead with a draft for the human to correct. In enabled `/ff` mode, ask the configured independent review model for a retrospective from the durable run evidence and reconcile it against the executor's draft; unresolved disagreement is recorded as a follow-up for the human.
+5. **Record it** via `review-entry`. Create the per-item file once; never overwrite an existing retrospective.
 6. **Route what graduates.** Each structural lesson goes where it can take effect:
 
    | Lesson | Destination |
@@ -48,7 +48,7 @@ Invoke deliberately. `integrate` offers this stage; it never runs it. This stage
    | A decision with lasting trade-offs | `adr` |
    | A missing guard | `harden-process` |
 
-7. **Propose the amendment as a diff.** Any change to `docs/engineering-lifecycle.md` is shown and confirmed by a human before it is written. Nothing edits that file silently: it is the contract the whole loop reads.
+7. **Propose the amendment as a diff.** Any change to `docs/engineering-lifecycle.md` is shown and confirmed by a human before it is written. Nothing edits that file silently: it is the contract the whole loop reads. Route a cross-item improvement to the repository's existing process ledger; the per-item retrospective remains the work item's cycle record.
 8. **Feed the next item.** Report what changed and why, so the next `refine` run starts from a better definition than the last one did.
 
 **The improvement that matters most** is moving a Definition of Done item from the judgement lane to the deterministic lane: turning something people must remember into something that fails loudly. When a lesson can be expressed that way, prefer it. It is the only kind of process change that keeps working when everybody is busy.
@@ -57,7 +57,7 @@ Invoke deliberately. `integrate` offers this stage; it never runs it. This stage
 
 - Post-merge evidence was read, not inferred from the pull request.
 - Effort figures come from telemetry, and anything missing is reported as missing.
-- The entry was appended, never edited over an existing one.
+- The per-item record was created once, never edited over an existing one.
 - Every structural lesson has a destination, or a recorded reason for warranting no change.
 - No amendment to the configuration was written without a shown diff and a confirmation.
 - A role capability fix was made at its source, not in a generated copy.

@@ -46,8 +46,9 @@ Available two ways. In the main session it is this skill. Where the raw tracker,
    | Merged | `review` |
 
 4. **Report the Done gate's detail** where the item has reached implementation: read the existing evidence and the Done gate configuration, and list the unmet items with their lanes and roles. This is a read-only pass: read the evidence files the Definition of Done records, read the configuration, and report what is satisfied, what is unmet, and what was never verified. Do **not** run `verify-done`'s full workflow, which runs checks and captures runtime artifacts — that writes files and contradicts this skill's read-only guarantee. Where no evidence has been recorded yet, report that rather than running the checks to produce it. "Not done" is only useful with the list attached.
-5. **Report review debt**: merged items with no entry in the review log. Naming it is the whole job here; this capability never chases anyone.
+5. **Report review debt**: items merged on or after the retrospective baseline date in `## Label conventions` with no per-item retrospective at the configured path (default `docs/reviews/issue-<number>.md`). Earlier merges are historical, not debt. Naming the missing records is the whole job here; this capability never chases anyone.
 6. **Flag drift** where the item's recorded state and reality disagree: an open pull request against an item still marked ready, a merged pull request against an item still in progress, a branch with no item, an item in progress with no branch.
+7. **Report Fast Forward history** when `## Fast Forward` is enabled or a run record exists for the item. Read the configured evidence location and the work item's final integration comment where available. Report each matching run's ID and effective status, executor and reviewer models, commit reviewed, gate decisions, correction rounds, stop reason, and PR link. Treat an `awaiting-integration` record as complete only when the linked pull request is confirmed merged and the final completion comment matches its run ID. A review decision is valid only for the commit SHA recorded with that decision. Do not resume, edit, or repair a run record.
 
 ## Validation
 
@@ -56,6 +57,7 @@ Available two ways. In the main session it is this skill. Where the raw tracker,
 - A "not done" verdict carries the list of unmet items with lanes and roles.
 - Drift is reported as a finding, not corrected.
 - Review debt is reported even when it is empty.
+- Matching Fast Forward executions and independent review decisions are reported from durable evidence, or their absence is stated.
 
 ## Common pitfalls
 

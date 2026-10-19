@@ -14,11 +14,11 @@ One responsibility: merge one approved pull request, composing the commit messag
 | **Input** | A pull request identifier, the merge strategy, and the subject and body for the resulting commit. |
 | **Output** | The merge commit's identifier and the pull request's final state. |
 | **Writes** | Merges into the target branch and, where configured, deletes the source branch. |
-| **Confirmation** | **Required.** Confirm before merging. |
+| **Confirmation** | **Required** in normal use. An enabled `/ff` invocation supplies confirmation for this merge only when the lifecycle configuration authorizes it and the forge's protection rules are satisfied. |
 
 **Guarantees to the caller**
 
-- The pull request was still open and still approved immediately before the merge, re-checked rather than assumed.
+- The pull request was still open and still approved immediately before the merge, re-checked rather than assumed. In `/ff` mode, a recorded independent reviewer decision may satisfy the lifecycle approval only where the forge does not require a human approval.
 - The commit subject describes the **implemented change**, not the proposal the pull request opened with.
 - The message is set explicitly, so no auto-generated body carries anything unintended onto the target branch.
 
@@ -26,7 +26,7 @@ One responsibility: merge one approved pull request, composing the commit messag
 
 - Merge a draft pull request.
 - Merge a pull request whose required checks have not passed.
-- Cast an approval on the author's behalf without explicit human confirmation.
+- Cast an approval on the author's behalf. The `/ff` decision is recorded as an independent lifecycle review, never forged as a human vote.
 - Let the forge auto-generate the squash body.
 
 ## Adapting this template

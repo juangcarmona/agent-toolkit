@@ -28,7 +28,7 @@ Invoke deliberately. No lifecycle stage runs this one on its own.
 
 ## Workflow
 
-Every external write is shown first and confirmed.
+Every external write is shown first and confirmed, except when invoked by an enabled `/ff` run whose durable record authorizes routine lifecycle writes. That mode changes no gate or protection rule.
 
 1. **Load the configuration.** Read `docs/engineering-lifecycle.md`. Absent means stop and say to run `adopt` first.
 2. **Check readiness.** `read-work-item`, then `refine-to-ready` in evaluate mode. Not ready means stop and point at `refine` for this item, naming the unmet dimensions. Never plan around an undefined problem: the design will encode the ambiguity and nobody will see it again until implementation.
@@ -43,7 +43,7 @@ Every external write is shown first and confirmed.
 11. **Branch and commit.** `create-branch` from the current target, commit the plan artifact, push.
 12. **Raise the draft pull request** via `open-pull-request` with `draft` set. The draft state **is** the review gate: unmergeable by construction. The body carries the plan summary and links the item. The draft does **not** guarantee CI will not run: GitHub `pull_request` workflows can run on drafts unless the workflow filters on `draft`. Whether validation ran is a check-state fact, not a draft-state fact.
 13. **Share it back** via `comment-work-item` with the plan summary and the pull request link, where that role is installed.
-14. **Stop at the Planned gate.** It is a human gate: a person reads the plan in the pull request thread and answers whether this is the right problem, the right solution, and the right tests. Name `implement` as what follows once the plan is approved, and do not invoke it.
+14. **Stop at the Planned gate.** In normal mode, a person reads the plan in the pull request thread and decides whether this is the right problem, solution, and test plan. In enabled `/ff` mode, return the plan for an independent review by the configured different model; only its durable `approve` decision can substitute for this gate. A forge-required human review remains required. Name `implement` as what follows once the applicable review passes, and do not invoke it.
 
 ## Validation
 
@@ -52,7 +52,7 @@ Every external write is shown first and confirmed.
 - The Definition of Done items this change must satisfy are listed explicitly.
 - Exactly one branch and one pull request exist for the item, and the pull request is a draft.
 - The work-in-progress cap was respected where one is configured.
-- Nothing but the plan artifact was committed.
+- Nothing but the plan artifact was committed, except that an enabled `/ff` run also commits its run evidence record so decisions remain durable.
 - The stage ended at the gate, naming `implement` without invoking it.
 
 ## Common pitfalls
