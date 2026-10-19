@@ -54,7 +54,7 @@ Skills are slash commands in Claude Code and are namespaced by the plugin, so `/
 | `status`    | Read-only: where an item sits and what comes next                 |
 | `ff`        | Run the configured lifecycle with bounded independent reviews     |
 
-`/adopt defaults` resets the previous Agentic SDLC lifecycle configuration and its listed role adaptations to the package defaults. It preserves verified project requirements and unrelated files, migrates only unambiguous open-issue lifecycle labels, and reports items it cannot safely map.
+`/adopt defaults` resets the previous Agentic SDLC lifecycle configuration and its listed role adaptations to the package defaults. It preserves verified project requirements and unrelated files, migrates only unambiguous open-issue lifecycle labels, replaces legacy Fast Forward wrappers with the package `ff` capability, and reports items it cannot safely map.
 
 ### Agents
 
