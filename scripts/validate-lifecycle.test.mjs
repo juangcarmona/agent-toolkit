@@ -28,7 +28,8 @@ test('defaults adoption resets owned configuration and safely migrates recognize
   assert.match(adopt, /Do not remove a file that is absent from the prior Installed roles table/);
   assert.match(adopt, /Leave ambiguous issues.*all closed issues unchanged/);
   assert.match(adopt, /Never delete a GitHub label/);
-  assert.match(adopt, /Make the package `ff` skill the single Fast Forward implementation/);
+  assert.match(adopt, /installed package skills the single Agentic SDLC stage implementation/);
+  assert.match(adopt, /Preserve unrelated user commands and skills/);
   assert.match(adopt, /docs\/delivery\/ff\/<work-item-id>\/<run-id>\//);
 });
 
