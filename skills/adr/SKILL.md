@@ -1,6 +1,6 @@
 ---
 name: adr
-description: "Author an Architecture Decision Record from the shared template, assigning the next sequential number, status and date, and updating the index. Use when a decision has trade-offs a future contributor will need."
+description: "Draft and maintain Architecture Decision Records from maintainer-supplied decisions and repository evidence. Use when a durable architectural trade-off needs a reviewable record."
 license: MIT
 metadata:
   author: juangcarmona
@@ -33,22 +33,21 @@ A plan explains how a particular change will be delivered; an ADR preserves a du
 
 ## Workflow
 
-When step 8 applies, preserve this section 09 table structure:
+When an accepted ADR is indexed in arc42 section 09, preserve this table structure:
 
 ```markdown
 | Decision | ADR | Affected architecture |
 | --- | --- | --- |
 ```
 
-1. **Derive the title.** A short, present-tense phrase naming the decision ("Store sessions in the cache tier", not "Sessions"). It becomes the heading. _Done when:_ the title names a decision, not a topic.
-2. **Locate the records directory.** Default `docs/adr/`. Absent means ask where the project keeps decision records rather than creating a directory the team did not ask for. _Done when:_ the directory is known and exists.
-3. **Compute the next number.** Take the highest existing four-digit prefix and add one, zero-padded. Numbers only ever increase and are never reused, not even a retired one. _Done when:_ the number is unique and next in sequence.
-4. **Slug the filename.** Lowercase the title, hyphenate spaces, drop punctuation: `NNNN-<slug>.md`. _Done when:_ the filename carries the number and the slug.
-5. **Fill the template** from [`references/template.md`](references/template.md). Complete the frontmatter with a stable lowercase `name`, one-sentence `description`, valid `status`, `date`, and any known `deciders` and `tags`, then complete every body section: Context (neutral facts, why a decision is needed), Decision (active voice, "We will …"), Consequences (positive, negative, neutral), Alternatives considered (each with a one-line reason for rejection), References. _Done when:_ no placeholder text remains anywhere in the document.
-6. **Set the metadata.** Status `Proposed` and today's date for a new record, unless the human states the decision is already accepted. `deciders` and `tags` are optional; include them when known and use empty lists when they are not. The metadata belongs only in frontmatter so tools can read it without parsing the body. _Done when:_ status and date are set from the vocabulary below, and optional metadata is either populated or represented by an empty list.
-7. **Write the file**, then **update the ADR index**: a row carrying the number, the title linked to the file, the status and the date, keeping the table ordered by number. No ADR index in the project means say so rather than inventing one. _Done when:_ the file exists and the ADR index has a matching row, or its absence is reported.
-8. **Update the architecture decision index when applicable.** If the ADR is `Accepted` and `docs/architecture/09-architecture-decisions.md` exists, add or update its row using `Decision`, `ADR`, and `Affected architecture`. Identify the relevant arc42 sections or architectural areas. Keep status, context, rationale, alternatives, consequences and history only in the ADR. Do not add a `Proposed` ADR as current architecture. When the accepted ADR supersedes another decision, make section 09 point to the ADR representing the current architecture. Do not modify other arc42 documents; reflecting the resulting system shape belongs to the architecture-maintenance workflow. _Done when:_ an accepted architectural decision is indexed without duplicated ADR content, or section 09 is absent or not applicable and remains unchanged.
-9. **Report** the created path and the assigned number. _Done when:_ the caller can link the record.
+1. **Confirm decision authority.** Identify the maintainer or role authorized to decide. The decision must come from that authority; repository evidence can reveal current behavior and constraints but cannot establish intent or acceptance. If the decision is unknown, ask for it rather than inferring a choice from code, plans, or an issue. Keep new records `Proposed` unless the maintainer explicitly says the decision is accepted.
+2. **Inspect the repository convention.** Read the existing ADR collection, its index, relevant accepted ADRs, and architecture decision index when present. Reuse the canonical location, filename, metadata, status vocabulary, and index. Never create a parallel collection. If no convention exists, use `docs/adr/`, create its `README.md` index, and follow the default format in [`references/template.md`](references/template.md).
+3. **Name and number the record.** Use a short present-tense decision title. Follow the repository's established identifier and filename pattern. For the default format, take the highest existing `ADR-NNNN` identifier and increment it; numbers only increase and are never reused, including retired numbers. Use `ADR-NNNN-kebab-case-title.md` for the default filename. If the repository's existing pattern is ambiguous, preserve it and surface the ambiguity for review instead of starting a second scheme.
+4. **Copy the template and complete it.** Fill Context with neutral, evidence-backed facts, constraints, assumptions, and the reason a decision is needed. State the supplied choice actively in Decision. List the main rejected alternatives and why each was rejected. Describe positive, negative, and neutral consequences. Add references. Separate observed facts, maintainer-supplied intent, and unresolved assumptions; do not present an inference as a decision. Remove every placeholder.
+5. **Preserve history.** Reverse a decision by proposing a new ADR, not by rewriting the old rationale. Do not mark an existing ADR superseded until the replacement decision is accepted. Confirm a superseding relationship with the maintainer before recording it.
+6. **Update the canonical ADR index.** Add a row for each record using the repository's existing index shape. If the default `README.md` index is used, link the ID/title and show status and date in numeric order. Keep the index navigational; rationale and consequences belong in the ADR. If an established repository has no index, report that and ask before creating one rather than silently inventing a convention.
+7. **Update arc42 section 09 when applicable.** Only an `Accepted` ADR belongs in `docs/architecture/09-architecture-decisions.md`. Add or update a row with `Decision`, `ADR`, and `Affected architecture`, identifying relevant arc42 sections or areas. Keep status, context, rationale, alternatives, consequences, and history in the ADR. A superseded decision's entry must point to the record representing the current architecture. Do not change other arc42 sections here; architecture maintenance documents the resulting system shape.
+8. **Present the record for review.** Show the complete diff, identify evidence and assumptions, report the path and identifier, and surface open questions. Leave acceptance of a proposed decision and acceptance of the documentation to the maintainer.
 
 ### Status vocabulary
 
@@ -60,19 +59,19 @@ Drawn from a fixed set. Never invent a value.
 | `Accepted`               | Agreed and in effect                           |
 | `Rejected`               | Considered and declined, kept for the record   |
 | `Deprecated`             | No longer applies, and not replaced            |
-| `Superseded by ADR-NNNN` | Replaced by a later decision; link it          |
+| `Superseded by ADR-NNNN` | Replaced by an accepted decision; link it      |
 
 Records are immutable in spirit. To reverse a decision, write a new record and mark the old one superseded, never rewrite history. The date records when the status last changed.
 
 ## Validation
 
-- The filename carries a zero-padded, unique, next-in-sequence number.
-- The document starts with YAML frontmatter containing a stable lowercase `name` and a one-sentence `description`.
+- The filename and identifier follow the repository convention; under the default format the filename is `ADR-NNNN-kebab-case-title.md` with a unique, sequential four-digit `ADR-NNNN` identifier.
+- The document starts with YAML frontmatter containing the fields in the repository's convention; under the default format it has `id`, `title`, `status`, `date`, and `deciders`, with `supersedes` or `superseded_by` only for a confirmed relationship.
 - The document has its heading, valid frontmatter, and all five sections in order, with no leftover placeholders.
 - The status is a valid value from the vocabulary and the date is `YYYY-MM-DD`.
-- `deciders` and `tags` are YAML lists when present; either may be an empty list.
+- The decision and its acceptance state are supplied by an authorized maintainer, never inferred from implementation evidence.
 - Alternatives considered names at least the main rejected option, with a reason: this is what separates a decision record from a commit message.
-- The index has a matching row, or the project's lack of an index is reported.
+- The canonical ADR index has a matching entry, or the established absence of an index is reported without creating a competing convention.
 - When section 09 exists, it indexes accepted architectural decisions using only `Decision`, `ADR`, and `Affected architecture`; proposed decisions are absent, and an entry for a superseded decision points to the ADR representing the current architecture.
 
 ## Common pitfalls
@@ -82,9 +81,10 @@ Records are immutable in spirit. To reverse a decision, write a new record and m
 | Hand-rolling the sections | Copy `references/template.md`. It is the single source of the document's shape |
 | Reusing a number, including a retired one | Numbers only ever increase |
 | Inventing a status value | Use the fixed vocabulary, `Superseded by ADR-NNNN` included |
-| Rewriting an existing record to reverse it | New record, old one marked superseded. The history stays readable |
-| Creating `docs/adr/` because it was missing | Ask where the project keeps decision records |
-| Inventing an index the project does not have | Report its absence instead |
+| Rewriting an existing record to reverse it | Propose a new record; mark the old one superseded only after the replacement is accepted |
+| Inferring a decision from implementation | Ask the authorized maintainer for the decision; evidence establishes behavior, not intent |
+| Creating a parallel ADR collection | Reuse the repository's canonical folder and index |
+| Silently adding a convention to an established collection with no index | Report the gap and ask before changing the convention |
 | Titling the record with a topic | The title names the decision, in present tense |
 | Leaving Alternatives considered empty | Without the rejected option and its reason, this is a commit message |
 | Leaving template placeholder text in place | Every section is filled before the file is written |
@@ -92,3 +92,4 @@ Records are immutable in spirit. To reverse a decision, write a new record and m
 | Treating a plan as the ADR | Keep delivery detail in the plan; link a durable ADR without copying it |
 | Adding a proposed ADR to arc42 section 09 | Index it only after acceptance |
 | Copying ADR details into arc42 section 09 | Keep section 09 to decision, ADR link and affected architecture |
+| Treating an inferred or proposed choice as accepted | Keep it Proposed until the maintainer explicitly accepts it |
