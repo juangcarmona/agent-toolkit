@@ -2,7 +2,7 @@
      role="img" aria-labelledby="title desc"
      font-family="'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif">
   <title id="title">From a backlog item to a merged change</title>
-  <desc id="desc">The agentic-sdlc loop: Backlog, Refine, Propose, Implement, Integrate, Review. Refine ends at the Ready gate, verified by an agent. Propose ends at the Planned gate, verified by a human. Implement ends at the Done gate, verified by CI and a human. Review feeds back into the backlog.</desc>
+  <desc id="desc">The agentic-sdlc loop: Backlog, Refine, Propose, Implement, Integrate, Review. Refine ends at the Ready gate, verified by an agent. Propose ends at the Planned gate, usually verified by a human; configured Fast Forward runs may use an independent reviewer where policy permits. Implement ends at the Done gate, verified by deterministic checks and judgement from named roles or explicitly substitutable independent review. Review feeds back into the backlog.</desc>
 
   <defs>
     <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">

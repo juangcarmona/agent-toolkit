@@ -11,6 +11,8 @@ Every capability locates what it needs by heading, so headings may not be rename
 | Definition of Ready | `refine-to-ready`, `refine`, `status` |
 | Definition of Done | `verify-done`, `propose`, `implement`, `integrate`, `status` |
 | Lifecycle stages and states | every stage capability, `status` |
+| Label conventions | `adopt`, `refine`, `propose`, `implement`, `integrate`, `review`, `status`, `ff` |
+| Fast Forward | `ff`, `status`, and every stage invoked by `ff` |
 | Work item fields | the transition and update role capabilities |
 | Work in progress | `propose`, `implement` |
 | Roles | `verify-done`, `implement`, `integrate` |
@@ -26,6 +28,9 @@ Every capability locates what it needs by heading, so headings may not be rename
 - **Mark inapplicable dimensions `N/A` with a one-line reason** rather than deleting the row. A dropped row reads as an oversight; an `N/A` with a reason reads as a decision.
 - **Judgement items must name a role** that appears in the Roles section.
 - **Provided roles must carry names resolved from live tooling.** A plan-artifact contract whose provider name was transcribed from memory breaks dispatch the first time a stage needs it, and the failure will look like a missing skill rather than a stale record.
+- **Fast Forward is opt-in and fail-closed.** The executor and reviewer models must be resolved by the active harness and differ. A harness that cannot select and attest both models cannot run Fast Forward.
+- **Fast Forward invocation is explicit authorization for routine writes** performed by its composed stages and adapted role skills. Standalone confirmation rules still apply outside Fast Forward. This authorization never substitutes for a human decision explicitly required by the repository or forge, never approves on a user's behalf, and never overrides protected branches or red lines.
+- **A second adoption pass is a no-op when the configuration, labels, conventions, and installed roles already conform.** Preserve repository-specific decisions and label usage.
 
 ## Absence is a hard stop
 

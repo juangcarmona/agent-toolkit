@@ -1,6 +1,6 @@
 # `agentic-sdlc`
 
-An adaptive development lifecycle for agent-driven delivery: readiness and verification gates, deterministic checks, and explicit human approval, adapted to the tools a project already uses.
+An adaptive development lifecycle for agent-driven delivery: readiness and verification gates, deterministic checks, and explicit human approval, with opt-in independent agent reviews where repository policy permits them.
 
 It imposes no tracker, no ai harness or engine, no CI system and no methodology. The `adopt` capability discovers what a project already uses and writes that down as the project's own configuration.
 
@@ -16,13 +16,13 @@ In Claude Code: `/plugin marketplace add juangcarmona/agent-toolkit`, then `/plu
 
 The development change lifecycle, from backlog and refinement through planning, implementation, integration and review.
 
-No capability invokes the next. Each ends at a gate and names what follows.
+Individual lifecycle stages end at their configured gate and do not invoke the next stage. The opt-in `ff` capability composes those existing stages when unattended execution is configured.
 
 | Gate    | Where              | Question                               | Verified by                                                                                |
 | ------- | ------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------ |
 | Ready   | end of `refine`    | Is the problem sufficiently defined?   | An agent, semantically, alerting a human                                                   |
-| Planned | end of `propose`   | Is the solution sufficiently designed? | A human, reviewing the plan in a draft pull request                                        |
-| Done    | end of `implement` | Is the change sufficiently verified?   | Two lanes: CI and tooling for the deterministic items, a named role for the judgement ones |
+| Planned | end of `propose`   | Is the solution sufficiently designed? | A human, or configured independent reviewer in `ff`, reviewing the plan                   |
+| Done    | end of `implement` | Is the change sufficiently verified?   | CI and tooling plus named roles; `ff` may decide configured substitutable judgement items |
 
 ## Out of scope
 
@@ -36,7 +36,7 @@ Each adopting project owns its lifecycle configuration after `adopt` writes it. 
 
 ## Contents
 
-Seven capabilities, each a skill that owns its steps and that you invoke by name. Ten supporting skills the capabilities call. Two agents. Twenty-five role-capability templates as adoption payload.
+Eight lifecycle capabilities and the `/plan` compatibility alias, each invoked by name. Ten supporting skills the capabilities call. Two agents. Twenty-five role-capability templates as adoption payload.
 
 ### Capabilities
 
@@ -44,13 +44,17 @@ Skills are slash commands in Claude Code and are namespaced by the plugin, so `/
 
 | Capability  | What it does                                                      |
 | ----------- | ----------------------------------------------------------------- |
-| `adopt`     | Bootstrap or reconcile this project's lifecycle configuration     |
+| `adopt`     | Bootstrap, reconcile, or reset this project's lifecycle defaults |
 | `refine`    | Stage 1: take an idea or item to the Definition of Ready          |
+| `plan`      | Compatibility alias for `propose`                                 |
 | `propose`   | Stage 2: design the solution and raise it as a draft pull request |
 | `implement` | Stage 3: apply the plan and take the change to the Done gate      |
 | `integrate` | Stage 4: enforce the gate, merge, and close the loop              |
 | `review`    | Stage 5: learn from the cycle and amend the process               |
 | `status`    | Read-only: where an item sits and what comes next                 |
+| `ff`        | Run the configured lifecycle with bounded independent reviews     |
+
+`/adopt defaults` resets the previous Agentic SDLC lifecycle configuration and its listed role adaptations to the package defaults. It preserves verified project requirements and unrelated files, migrates only unambiguous open-issue lifecycle labels, and reports items it cannot safely map.
 
 ### Agents
 
@@ -63,7 +67,7 @@ Agents are not lifecycle stages. They are used only where isolation or delegatio
 
 ### Skills
 
-The seven capabilities: [`adopt`](skills/adopt), [`refine`](skills/refine), [`propose`](skills/propose), [`implement`](skills/implement), [`integrate`](skills/integrate), [`review`](skills/review), [`status`](skills/status).
+The lifecycle capabilities: [`adopt`](skills/adopt), [`refine`](skills/refine), [`plan`](skills/plan) (alias), [`propose`](skills/propose), [`implement`](skills/implement), [`integrate`](skills/integrate), [`review`](skills/review), [`status`](skills/status), and [`ff`](skills/ff).
 
 | Supporting skill                            | Job                                                                 |
 | ------------------------------------------- | ------------------------------------------------------------------- |
@@ -72,7 +76,7 @@ The seven capabilities: [`adopt`](skills/adopt), [`refine`](skills/refine), [`pr
 | [`verify-like-ci`](skills/verify-like-ci)   | Run locally what CI will run, derived from the pipeline definitions |
 | [`verify-runtime`](skills/verify-runtime)   | Drive the real application and capture the evidence                 |
 | [`harden-process`](skills/harden-process)   | Turn one failure into the smallest durable guard                    |
-| [`review-entry`](skills/review-entry)       | Append one dated entry to the review log                            |
+| [`review-entry`](skills/review-entry)       | Create one dated retrospective file per work item                   |
 | [`collect-usage`](skills/collect-usage)     | Human-versus-agent effort from captured telemetry                   |
 
 Three further skills are shared with the parent repository's root collection and installed through its [`apm.yml`](apm.yml) git dependency rather than duplicated here: [`adr`](../../skills/adr), [`rebase-safely`](../../skills/rebase-safely), and [`git-worktrees`](../../skills/git-worktrees). They are validated, versioned, and distributed from one canonical copy in `skills/`.

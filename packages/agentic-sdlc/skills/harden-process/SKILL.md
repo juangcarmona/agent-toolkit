@@ -34,7 +34,7 @@ Input is what failed and the evidence: a pipeline log, a review comment, a defec
 3. **Locate the single source of truth** for that gap: the one skill, capability, definition or convention that owns it. The same meaning in two places is duplication, and duplicated copies drift apart. *Done when:* exactly one file is identified as the owner.
 4. **Land the smallest edit that makes the gap checkable.** In order of preference: sharpen an existing completion criterion; add a step; add a new skill only when a genuinely distinct responsibility has appeared. **The edit must be one an agent can fail**: *"verify X exists"* beats *"remember to X"*. *Done when:* the edit is written, and a run that skipped it would be detectably wrong.
 5. **Apply the counterfactual.** Re-read the edited instruction against the original failure and state plainly whether, followed literally, it would have caught it. *Done when:* the answer is yes. If it is no, the edit is not finished.
-6. **Record it where the team will meet it**: the review-log entry for the work item, and a note on the item or the pull request when a reviewer needs to know the process moved. *Done when:* the guard is discoverable by someone who was not in this session.
+6. **Record it where the team will meet it**: the work item's per-item retrospective, and a note on the item or the pull request when a reviewer needs to know the process moved. *Done when:* the guard is discoverable by someone who was not in this session.
 
 ### Where a guard may live
 

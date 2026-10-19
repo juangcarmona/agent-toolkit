@@ -73,15 +73,15 @@ The commands that produce the deterministic lane's evidence. `verify-like-ci` de
 
 ## Lifecycle stages and states
 
-How the loop's stages map onto this project's work-item states. Every value is resolved from live tooling during adoption, never transcribed from a diagram: a wrong id here misroutes every stage.
+How the loop's stages map onto this project's work-item states. For GitHub, `adopt defaults` uses the canonical `status:*` labels in [`github-label-standard.md`](../references/github-label-standard.md); ordinary adoption maps the same semantics to the live tracker. Every provider-specific value is resolved from live tooling during adoption.
 
 | Stage | State on entry | State on exit | Transition | Fired by |
 | --- | --- | --- | --- | --- |
-| `refine` | `<…>` | `<…>` | `<…>` | agent, human-confirmed |
-| `propose` | `<…>` | `<…>` | `<…>` | `propose` |
-| `implement` | `<…>` | `<…>` | `<…>` | `implement` |
-| `integrate` | `<…>` | `<…>` | `<…>` | `integrate` |
-| `review` | `<…>` | `<…>` | - | - |
+| `refine` | `status:backlog` | `status:ready` | Set Ready after the gate passes | `refine` |
+| `propose` | `status:ready` | `status:proposed` | Set after the proposal passes its review gate | `propose` |
+| `implement` | `status:proposed` | `status:in-progress` → `status:in-review` | Set `in-progress` on entry; set `in-review` when the Done gate passes and the PR is ready | `implement` |
+| `integrate` | `status:in-review` | `status:done`, issue closed | Merge the linked PR; verify GitHub closes the issue, then set `status:done` | `integrate` |
+| `review` | `status:done` | `status:done` | Create the per-item retrospective; no status transition | `review` |
 
 ### Transitions no capability ever fires
 
@@ -90,6 +90,35 @@ How the loop's stages map onto this project's work-item states. Every value is r
 | Transition | Meaning | Who fires it |
 | --- | --- | --- |
 | `<…>` | `<…>` | human only |
+
+## Label conventions
+
+Use the shared label vocabulary from the installed `adopt` capability. Record this repository's provider, label store, exact labels or mapped states, and repository-specific exceptions here. Do not rename or repurpose labels with existing usage. Use `Not applicable` when this repository does not use labels for lifecycle state.
+
+| Concern | This project uses |
+| --- | --- |
+| Provider and state store | `<GitHub labels / other live-resolved mechanism / Not applicable>` |
+| Canonical lifecycle statuses | `status:backlog`, `status:ready`, `status:proposed`, `status:in-progress`, `status:in-review`, `status:done` or verified provider mapping |
+| Optional overlays | `blocked`, `owner-review`, only when used |
+| Optional labels adopted and why | `<…>` |
+| Issue and pull request conventions | `<paths, required fields, or Not applicable>` |
+| Per-item review record | `docs/reviews/issue-<number>.md`, one file per work item |
+| Retrospective baseline date | `<adoption date; earlier merges are historical and excluded from review debt>` |
+| Process ledger and conflict practice | `<existing path and format for cross-item lessons, or Not used>` |
+
+## Fast Forward
+
+Fast Forward is opt-in. It may run only stages and gates already configured above, using the stage capabilities as the implementation of each step. It never waives deterministic checks or forge/repository protection.
+
+| Setting | This project requires |
+| --- | --- |
+| Enabled | `yes` when the harness can select and attest an independent reviewer; otherwise `no` with the reason |
+| Executor model | Resolve from the active harness at run time |
+| Independent review model | Select a different model through the active harness for each run |
+| Maximum correction rounds per gate | `3` |
+| Substitutable judgement items | `none` by default; list item IDs and rationale only when the repository explicitly authorizes substitution |
+| Durable evidence location and format | `docs/delivery/ff/<work-item-id>/<run-id>/run.json` and `summary.md` |
+| Human-only or protected gates that stop automation | Product-scope and accepted-decision changes, forge-required human approvals, deployments, and repository red lines; `/ff` may merge only when every configured gate and protection rule passes |
 
 ## Work item fields
 
