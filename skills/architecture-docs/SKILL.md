@@ -1,6 +1,6 @@
 ---
 name: architecture-docs
-description: Maintain architecture documentation by checking implementation evidence, ADRs and product intent, and pruning legacy content. Use for architecture reviews, stale docs, changes to system boundaries, components, runtime, persistence, security, deployment, cross-cutting mechanisms, quality requirements, risks or technical debt, or publishing a self-contained arc42 HTML snapshot.
+description: Create, review, and maintain evidence-grounded arc42 architecture documentation from implementation evidence, ADRs, and product intent. Use for reverse engineering, architecture changes or audits, stale documentation, or publishing a self-contained arc42 HTML snapshot.
 license: MIT
 metadata:
   author: juangcarmona
@@ -9,6 +9,8 @@ metadata:
 # Maintain Architecture Documentation
 
 Maintain a concise explanation of **how** the system is structurally shaped. Use the canonical twelve arc42 sections as the explicit structure under `docs/architecture/`; `README.md` is the navigation index, not a thirteenth section.
+
+Treat architecture maintenance as evidence-led analysis and a reviewable proposal. Distinguish observed implementation, maintainer-supplied intent, assumptions, and proposed documentation. Code and configuration establish current behavior, not why it was chosen or whether a future direction is accepted. Ask the maintainer when a material intent or decision cannot be established safely, and never present a proposal as accepted.
 
 Keep these ownership boundaries intact:
 
@@ -62,11 +64,11 @@ Each section reference contains its canonical document scaffold. Use that scaffo
 
 ## Workflow
 
-### 1. Establish the evidence
+### 1. Establish bounded evidence coverage
 
-Read `docs/README.md`, `docs/architecture/` when present, the relevant parts of legacy `docs/ARCHITECTURE.md`, `docs/adr/README.md`, applicable ADRs, and the project's product-intent source when one exists. Inspect the source, tests, configuration and infrastructure that actually implement the affected behavior. Treat generated files and legacy architecture prose as leads to verify, never as proof.
+Read `docs/README.md`, `docs/architecture/` when present, the relevant parts of legacy `docs/ARCHITECTURE.md`, the ADR index and relevant ADRs, and the project's product-intent source when one exists. Inspect the source, tests, configuration, and infrastructure that implement the affected behavior. Treat generated files and legacy architecture prose as leads to verify, never as proof.
 
-If the request concerns a change, inspect its diff or planned touch points first. If it is a general audit, sample every architecture surface represented by the twelve arc42 sections. This step is complete when every claim under review has an identified owner and at least one current evidence source.
+If the request concerns a change, inspect its diff or planned touch points first and focus evidence review on the affected claims. If it is a general audit or reverse-engineering task, work in bounded rounds and track sources as reviewed, excluded, pending, or changed; do not claim complete coverage while material evidence remains pending. When ArcShape's evidence-session CLI is available, use `arcshape session start`, `status`, and `next` to create or resume rounds, record source classifications and findings with `mark`, correct mistakes with `unmark`, and re-read sources reported as changed. Without that CLI, use a concise working evidence map and report its coverage and limits; do not invent or commit a new tracking format unless requested. This step is complete when every claim under review has an identified owner and current evidence, and remaining gaps are explicit.
 
 ### 2. Apply the significance gate
 
@@ -110,7 +112,7 @@ Do not add citation metadata, drift markers, IDs, resolvers or verification tool
 
 ### 6. Use ADRs for significant decisions
 
-Create or reference an ADR through the repository's existing ADR process when a significant choice needs rationale, alternatives or consequences. `09-architecture-decisions.md` is the architecture-facing index of those decisions; other arc42 views describe the resulting shape and link to the ADR where relevant.
+Create or reference an ADR through the repository's existing ADR process when a significant choice needs rationale, alternatives or consequences. When the shared `adr` skill is available, use it for authoring and lifecycle; this skill owns the resulting architecture views, not a second ADR workflow. `09-architecture-decisions.md` is the architecture-facing index of accepted decisions; other arc42 views describe the resulting shape and link to the ADR where relevant.
 
 Keep rationale, rejected alternatives and consequences in the ADR rather than repeating them in arc42 sections. This step is complete when every significant decision has one authoritative ADR and all affected architecture views link to it without duplicating it.
 
@@ -141,7 +143,7 @@ npx markdownlint-cli2 <changed-markdown-files>
 
 When the project's product-intent source provides citation verification, run it over the edited architecture documents (for example `npx prodshape citations verify docs/architecture --format json` under ProductShape). While the legacy file contains citations or is edited directly, validate it by passing `docs/ARCHITECTURE.md` as the target. Treat every stale, unresolved or tampered citation as a review item; do not silence it by deleting the citation or copying the product text. Check links and Mermaid syntax with repository tooling when available, and compare every changed diagram and statement with the implementation evidence gathered in step 1.
 
-Report the significance decision, files changed, evidence checked, product-intent citation status, ADRs created or referenced, legacy content removed or deferred, checks run and unresolved risks. This step is complete when validation passes or every remaining failure is reported without being hidden.
+Present the proposed diff for maintainer review; do not silently overwrite authored material or claim the proposal has been accepted. Report the significance decision, evidence coverage and sources checked, product-intent citation status, observations versus assumptions, ADRs created or referenced, legacy content removed or deferred, checks run, open questions, and unresolved risks. This step is complete when validation passes or every remaining failure is reported without being hidden.
 
 ### 9. Publish a shareable snapshot (optional)
 

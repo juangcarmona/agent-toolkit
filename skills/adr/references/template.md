@@ -1,39 +1,32 @@
 ---
-name: <lowercase-unique-adr-name>
-description: <one-sentence summary of the decision>
+id: ADR-NNNN
+title: Short present-tense decision title
 status: Proposed
-date: YYYY-MM-DD
+date: "YYYY-MM-DD"
 deciders: []
-tags: []
 ---
 
-# ADR-NNNN: <short, present-tense decision title>
+<!-- markdownlint-disable-next-line MD025 -->
+# ADR-NNNN: Short present-tense decision title
 
 ## Context
 
-What is the problem, force, or requirement driving this decision? Describe the situation in neutral terms: the technical, business, and team constraints at play. State the facts; save opinions for the Decision section. A reader with no prior knowledge should understand *why a decision is needed* from this section alone.
+Describe the evidence-backed facts, forces, and constraints that make this decision necessary. Separate observed behavior, maintainer-supplied intent, assumptions, and unresolved questions.
 
 ## Decision
 
-The choice we are making, stated in active voice: "We will …". Be specific and unambiguous. Capture the essence of *what* changes and the core reasoning for *why* this option wins over the alternatives.
-
-## Consequences
-
-What becomes easier, harder, or different as a result: good and bad. Be honest about the trade-offs we are accepting.
-
-- **Positive:** <!-- benefits gained -->
-- **Negative:** <!-- costs, risks, or limitations accepted -->
-- **Neutral:** <!-- follow-on work, things to revisit, new constraints -->
+State the decision supplied by the authorized maintainer clearly and actively. A new record is Proposed unless the maintainer explicitly confirms it is accepted.
 
 ## Alternatives considered
 
-Options we evaluated and rejected, with a one-line reason for each. This is what separates an ADR from a commit message: it preserves the road not taken.
+- **Alternative**: rejected because reason.
 
-- **Alternative A**: rejected because …
-- **Alternative B**: rejected because …
+## Consequences
+
+- **Positive:** benefit
+- **Negative:** cost, risk, or limitation
+- **Neutral:** follow-up or constraint
 
 ## References
 
-<!-- Links to specs, issues, PRs, related ADRs, docs, or external sources. -->
-
-- Related: ADR-NNNN
+- Related: issue, pull request, specification, documentation, or ADR
