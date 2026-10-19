@@ -18,6 +18,7 @@ test('GitHub defaults define one canonical lifecycle status and separate overlay
   assert.match(standard, /Every open issue has exactly one `status:\*` label/);
   assert.match(standard, /`blocked` and `owner-review` are optional overlays/);
   assert.match(standard, /A post-merge retrospective is recorded by `review` and does not add another lifecycle status/);
+  assert.match(standard, /draft PR contains implementation work/);
   assert.match(standard, /Never infer `done` from a closed issue alone/);
 });
 

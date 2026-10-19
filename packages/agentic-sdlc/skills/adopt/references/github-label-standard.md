@@ -33,14 +33,18 @@ During `adopt defaults`, use this mapping for open GitHub issues. Preserve prior
 
 | Existing state | Default state |
 | --- | --- |
-| No status label and no evidence of active implementation or a linked PR; or `status:backlog` | `status:backlog` |
+| No status label; linked ready-for-review PR | `status:in-review` |
+| No status label; draft PR contains implementation work | `status:in-progress` |
+| No status label; draft PR contains a plan but no implementation | `status:proposed` |
+| No status label; active branch has implementation but no PR | `status:in-progress` |
+| No status label and no evidence of planning, implementation, or a linked PR; or `status:backlog` | `status:backlog` |
 | `stage:refine`, `status:ready`, `refined` | `status:ready` |
 | `stage:propose`, `status:proposed`, `proposed` | `status:proposed` |
 | `stage:implement`, `bot-working` | `status:in-progress` |
 | `stage:integrate`, `status:in-review`, `pr-pending` | `status:in-review` |
 | `stage:review`, `status:done` | `status:done` |
 
-Resolve ambiguous labels such as `review`, and missing labels on issues with an active branch or pull request, from the issue, pull request, branch, and merge state. If evidence does not establish one state, leave that issue untouched and report it. Read each issue immediately before migration, preserve its other labels, replace the recognized old lifecycle label in one update, then reread and verify exactly one `status:*` label remains. Never infer `done` from a closed issue alone.
+Resolve ambiguous labels such as `review`, and missing labels on issues with an active branch or pull request, from the issue, pull request draft/readiness, branch changes, checks, and merge state. A draft PR is `proposed` only when it carries a plan without implementation; a draft PR carrying implementation is `in-progress`. If evidence does not establish one state, leave that issue untouched and report it. Read each issue immediately before migration, preserve its other labels, replace the recognized old lifecycle label in one update, then reread and verify exactly one `status:*` label remains. Never infer `done` from a closed issue alone.
 
 ## Review records
 
