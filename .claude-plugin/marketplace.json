@@ -8,22 +8,12 @@
     {
       "name": "agentic-sdlc",
       "source": "./packages/agentic-sdlc",
-      "description": "An adaptive development lifecycle for agent-driven delivery: readiness and verification gates, deterministic checks, and explicit human approval. Installs the adr, rebase-safely and git-worktrees skills it uses."
+      "description": "An adaptive development lifecycle for agent-driven delivery: readiness and verification gates, deterministic checks, and explicit human approval. Installs the rebase-safely and git-worktrees skills it uses."
     },
     {
       "name": "product-definition",
       "source": "./packages/product-definition",
       "description": "Product definition as a capability: five commands and an advisory product-engineer agent over the product-definition skill, which is installed with it."
-    },
-    {
-      "name": "adr",
-      "source": "./",
-      "strict": false,
-      "description": "Author an Architecture Decision Record from the shared template, assigning the next sequential number, status and date, and updating the index. Use when a decision has trade-offs a future contributor will need.",
-      "version": "0.1.0",
-      "skills": [
-        "./skills/adr"
-      ]
     },
     {
       "name": "rebase-safely",

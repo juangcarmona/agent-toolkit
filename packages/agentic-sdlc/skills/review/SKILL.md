@@ -45,7 +45,7 @@ Invoke deliberately. `integrate` offers this stage; it never runs it. This stage
    | Something shipped that should not have | An amendment to the **Definition of Done**: a new item, or a lane change from judgement to deterministic |
    | A role capability misbehaved | The installed capability at its source, `.agents/skills/<role>/SKILL.md`, never a generated harness copy, which the next copy overwrites |
    | A gate fired at the wrong moment | A **gate** change |
-   | A decision with lasting trade-offs | `adr` |
+   | A decision with lasting trade-offs | The consuming project's architecture-decision workflow |
    | A missing guard | `harden-process` |
 
 7. **Propose the amendment as a diff.** Any change to `docs/engineering-lifecycle.md` is shown and confirmed by a human before it is written. Nothing edits that file silently: it is the contract the whole loop reads. Route a cross-item improvement to the repository's existing process ledger; the per-item retrospective remains the work item's cycle record.

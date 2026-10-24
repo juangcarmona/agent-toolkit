@@ -24,7 +24,7 @@ Invoke deliberately. No lifecycle stage runs this one on its own.
 
 - Writing the code. That is `implement`, which continues on the branch this stage creates.
 - Defining the problem or authoring acceptance criteria. That is `refine`.
-- Recording a decision with lasting trade-offs on its own. That is `adr`, which this stage calls when a decision graduates.
+- Recording a decision with lasting trade-offs on its own. That belongs to the consuming project's configured architecture-decision workflow when a decision graduates.
 
 ## Workflow
 
@@ -34,7 +34,7 @@ Every external write is shown first and confirmed, except when invoked by an ena
 2. **Check readiness.** `read-work-item`, then `refine-to-ready` in evaluate mode. Not ready means stop and point at `refine` for this item, naming the unmet dimensions. Never plan around an undefined problem: the design will encode the ambiguity and nobody will see it again until implementation.
 3. **Inspect the code.** Identify the affected components, the seams the change runs through, and what it will touch that nobody expects.
 4. **Check documentation drift** via `classify-doc-drift` where installed. A plan built on a page that is behind the code is a plan built on fiction. A pair reported diverged is a finding for a human, not something to fix here.
-5. **Design the solution**: approach, architecture impact, the trade-offs considered and why this one wins. A decision with lasting consequences graduates to an `adr`.
+5. **Design the solution**: approach, architecture impact, the trade-offs considered and why this one wins. A decision with lasting consequences is handed to the consuming project's configured architecture-decision workflow.
 6. **Plan the work**: ordered tasks, each small enough to be verifiably done.
 7. **Plan the tests.** What proves this change works: new and affected unit, integration and end-to-end scenarios. A first-class output, not an afterthought.
 8. **Name the Definition of Done items this change will have to satisfy**, from the configuration. The Done gate should never be the first time anyone reads them, and an item that will be expensive to satisfy is far cheaper to discover now.
