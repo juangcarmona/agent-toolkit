@@ -25,7 +25,7 @@ Input is what failed and the evidence: a pipeline log, a review comment, a defec
 - Fixing the code defect itself. That is `implement`, and it restores the build without closing the gap.
 - Recording the lesson in the review log. That is `review-entry`, which this skill's outcome feeds.
 - Amending `docs/engineering-lifecycle.md` without a shown diff and a human confirmation. `review` owns that proposal.
-- Recording a decision with lasting trade-offs. That is `adr`.
+- Recording a decision with lasting trade-offs. That belongs to the consuming project's configured architecture-decision workflow.
 
 ## Workflow
 

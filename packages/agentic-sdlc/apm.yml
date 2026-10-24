@@ -6,4 +6,4 @@ license: MIT
 dependencies:
   apm:
     - git: juangcarmona/agent-toolkit
-      skills: [adr, rebase-safely, git-worktrees]
+      skills: [rebase-safely, git-worktrees]

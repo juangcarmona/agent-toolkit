@@ -8,7 +8,6 @@ targets:
 includes:
   - skills/agent-skill-authoring
   - skills/document-to-markdown
-  - skills/adr
   - skills/architecture-docs/SKILL.md
   - skills/architecture-docs/references
   - skills/architecture-docs/snapshot/generate.mjs

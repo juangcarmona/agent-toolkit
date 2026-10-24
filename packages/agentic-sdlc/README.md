@@ -79,7 +79,7 @@ The lifecycle capabilities: [`adopt`](skills/adopt), [`refine`](skills/refine), 
 | [`review-entry`](skills/review-entry)       | Create one dated retrospective file per work item                   |
 | [`collect-usage`](skills/collect-usage)     | Human-versus-agent effort from captured telemetry                   |
 
-Three further skills are shared with the parent repository's root collection and installed through its [`apm.yml`](apm.yml) git dependency rather than duplicated here: [`adr`](../../skills/adr), [`rebase-safely`](../../skills/rebase-safely), and [`git-worktrees`](../../skills/git-worktrees). They are validated, versioned, and distributed from one canonical copy in `skills/`.
+Two further skills are shared with the parent repository's root collection and installed through its [`apm.yml`](apm.yml) git dependency rather than duplicated here: [`rebase-safely`](../../skills/rebase-safely) and [`git-worktrees`](../../skills/git-worktrees). They are validated, versioned, and distributed from one canonical copy in `skills/`.
 
 ## What adoption writes into a project
 
